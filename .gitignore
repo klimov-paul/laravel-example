@@ -1,15 +1,49 @@
-/node_modules
-/public/hot
-/public/storage
-/storage/*.key
-/vendor
-.env
-.env.backup
-.phpunit.result.cache
-docker-compose.override.yml
+# IDE
+/.idea
+.phpstorm.meta.php
+_ide_helper_models.php
+_ide_helper.php
+
+# Environment
+/.vscode
+/.vagrant
 Homestead.json
 Homestead.yaml
+
+# Composer
+composer.phar
+/vendor
+
+# BackEnd
+/storage/*.key
+.env
+.env.backup
+.env.testing
+.env.*.local
+/webroot
+
+# FrontEnd
+/node_modules
+/public/css
+/public/js
+/public/img
+/public/icons
+/public/fonts
+/public/svg
+/public/images
+/public/storage
+/public/media
+/public/vendor
+/public/mix-manifest.json
+package-lock.json
 npm-debug.log
 yarn-error.log
-/.idea
-/.vscode
+
+# PHPUnit
+phpunit.phar
+/phpunit.xml
+/phpunit.*.xml
+.phpunit.result.cache
+.php_cs.cache
+coverage
+cghooks.lock
