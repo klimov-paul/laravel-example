@@ -3,10 +3,12 @@
 namespace App\Models;
 
 use App\Enums\UserStatus;
+use App\Notifications\UserSignedUp;
 use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
 use Laravel\Sanctum\HasApiTokens;
 
 /**
@@ -57,6 +59,38 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    /**
+     * Registers new user account.
+     * New account remains 'pending' waiting for identity confirmation, keeping login forbidden.
+     * Sends email verification notification.
+     * @see confirmIdentity()
+     *
+     * @param  array  $attributes
+     * @return static self reference.
+     */
+    public function signup(array $attributes): self
+    {
+        if ($this->exists) {
+            throw new \LogicException('Unable to signup already existing account.');
+        }
+
+        if (isset($attributes['password'])) {
+            $password = $attributes['password'];
+        } else {
+            $password = Str::random(8);
+            $attributes['password'] = $password;
+        }
+
+        $this->fill($attributes);
+        $this->password = bcrypt($password);
+        $this->status = UserStatus::PENDING;
+        $this->save();
+
+        $this->notify(new UserSignedUp($password));
+
+        return $this;
+    }
 
     /**
      * Marks merchant as the one with confirmed identity (e.g. being a live person), allowing log in the system.
