@@ -12,6 +12,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "ext-json": "*",
+        "bensampo/laravel-enum": "^4.1",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "laravel/framework": "^8.75",

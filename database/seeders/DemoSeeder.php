@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\UserStatus;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -21,6 +22,7 @@ class DemoSeeder extends Seeder
         $user = User::query()->create([
             'name' => 'John Doe',
             'email' => 'johndoe@example.com',
+            'status' => UserStatus::ACTIVE,
             'email_verified_at' => now(),
             'password' => bcrypt('secret'),
         ]);

@@ -6,6 +6,10 @@ use App\Models\Admin;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @method \App\Models\Admin|\App\Models\Admin[] make()
+ * @method \App\Models\Admin|\App\Models\Admin[] create()
+ */
 class AdminFactory extends Factory
 {
     /**

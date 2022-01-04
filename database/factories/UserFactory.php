@@ -2,11 +2,22 @@
 
 namespace Database\Factories;
 
+use App\Enums\UserStatus;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
+/**
+ * @method \App\Models\User|\App\Models\User[] make()
+ * @method \App\Models\User|\App\Models\User[] create()
+ */
 class UserFactory extends Factory
 {
+    /**
+     * {@inheritdoc}
+     */
+    protected $model = User::class;
+
     /**
      * {@inheritdoc}
      */
@@ -15,6 +26,7 @@ class UserFactory extends Factory
         return [
             'name' => $this->faker->name(),
             'email' => $this->faker->unique()->safeEmail(),
+            'status' => UserStatus::ACTIVE,
             'email_verified_at' => now(),
             'password' => bcrypt('secret'),
             'remember_token' => Str::random(10),

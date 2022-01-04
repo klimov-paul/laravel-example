@@ -6,9 +6,14 @@
 
 namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+Route::name('auth.')->group(function () {
+    Route::post('login', Auth\LoginController::class.'@login')->name('login');
+
+    Route::post('logout', Auth\LoginController::class.'@logout')->name('logout');
+
+    Route::post('password/email', Auth\ForgotPasswordController::class.'@sendResetLinkEmail')->name('password.email');
+
+    Route::post('password/reset', Auth\ResetPasswordController::class.'@reset')->name('password.reset');
 });
