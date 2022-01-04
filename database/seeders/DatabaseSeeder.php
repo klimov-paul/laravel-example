@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call(AdminSeeder::class);
+
+        if (app()->environment('local')) {
+            if (DB::table('users')->count() > 0) {
+                return;
+            }
+
+            $this->call(DemoSeeder::class);
+        }
     }
 }

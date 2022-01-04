@@ -2,35 +2,28 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\Sanctum\HasApiTokens;
 
 /**
- * User represents system customer.
+ * Admin represents system administrator account.
  *
  * @property int $id
  * @property string $name
  * @property string $email
  * @property string $password
  * @property string|null $remember_token
- * @property \Illuminate\Support\Carbon|null $email_verified_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
- * @property \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
- *
  * @method static \Illuminate\Database\Eloquent\Builder|static query()
  */
-class User extends Authenticatable
+class Admin extends Authenticatable
 {
-    use HasApiTokens;
     use Notifiable;
     use SoftDeletes;
-    use MustVerifyEmail;
 
     /**
      * {@inheritdoc}
@@ -38,6 +31,7 @@ class User extends Authenticatable
     protected $fillable = [
         'name',
         'email',
+        'phone_number',
         'password',
     ];
 
@@ -47,12 +41,5 @@ class User extends Authenticatable
     protected $hidden = [
         'password',
         'remember_token',
-    ];
-
-    /**
-     * {@inheritdoc}
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
     ];
 }
