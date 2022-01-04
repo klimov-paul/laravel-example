@@ -1,4 +1,7 @@
 <?php
+/**
+ * @see https://laravel.com/docs/sanctum
+ */
 
 return [
 
