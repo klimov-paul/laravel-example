@@ -17,3 +17,5 @@ Route::name('auth.')->group(function () {
 
     Route::post('signup', Auth\SignupController::class.'@signup')->name('signup');
 });
+
+Route::apiResource('books', BookController::class)->only('index', 'show');
