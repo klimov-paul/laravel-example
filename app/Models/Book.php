@@ -44,4 +44,20 @@ class Book extends Model
     {
         return $this->belongsToMany(Category::class, 'book_has_category', 'book_id', 'category_id', 'id');
     }
+
+    public function favoriteBy(User $user): Favorite
+    {
+        return Favorite::query()->firstOrCreate([
+            'book_id' => $this->id,
+            'user_id' => $user->id,
+        ]);
+    }
+
+    public function unfavoriteBy(User $user): void
+    {
+        Favorite::query()
+            ->where('book_id', $this->id)
+            ->where('user_id', $user->id)
+            ->delete();
+    }
 }

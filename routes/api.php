@@ -19,3 +19,7 @@ Route::name('auth.')->group(function () {
 });
 
 Route::apiResource('books', BookController::class)->only('index', 'show');
+
+Route::name('me.')->middleware('auth:web')->group(function () {
+    Route::apiResource('favorites', Me\FavoriteController::class)->except('update');
+});

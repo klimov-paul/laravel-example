@@ -62,6 +62,14 @@ class User extends Authenticatable
     ];
 
     /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Favorite
+     */
+    public function favorites()
+    {
+        return $this->hasMany(Favorite::class);
+    }
+
+    /**
      * Registers new user account.
      * New account remains 'pending' waiting for identity confirmation, keeping login forbidden.
      * Sends email verification notification.
