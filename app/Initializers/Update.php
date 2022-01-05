@@ -40,7 +40,6 @@ class Update
         $run->artisan('cache:clear')
             ->artisan('view:clear')
             ->artisan('event:clear')
-            ->artisan('nova:publish')
             ->artisan('telescope:publish')
             ->artisan('migrate', ['--seed' => true, '--force' => true])
             ->artisan('queue:restart');
