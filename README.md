@@ -2,6 +2,8 @@ Laravel Example
 ===============
 
 Laravel example project used for common programming approaches demonstration.
+Project serves as on-line book library, when registered users can borrow a book for a limited time period.
+In order to use the library user should purchase a subscription, which requires recurring payment.
 
 
 Requirements
@@ -44,6 +46,16 @@ Crontab example:
 
 External Services
 -----------------
+
+##### Braintree
+---------------
+
+[Braintree](https://articles.braintreepayments.com/get-started/try-it-out) is used as system payment gateway.
+
+- [Setup Sandbox account](https://www.braintreepayments.com/sandbox)
+- [Setup automatic invoice sending](https://articles.braintreepayments.com/control-panel/transactions/email-receipts)
+- [Test credit cards](https://developers.braintreepayments.com/reference/general/testing/php#credit-card-numbers)
+
 
 ##### Google reCAPTCHA
 
