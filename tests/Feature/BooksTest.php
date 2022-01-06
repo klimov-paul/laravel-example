@@ -14,7 +14,7 @@ class BooksTest extends TestCase
     {
         $books = BookFactory::new()->count(2)->create();
 
-        $this->getJson(route('api.books.index'))
+        $this->getJson(route('api.books.index', ['sort' => '-id']))
             ->assertSuccessful()
             ->assertJsonStructure([
                 'data' => [

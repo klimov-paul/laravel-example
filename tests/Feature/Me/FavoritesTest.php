@@ -34,7 +34,7 @@ class FavoritesTest extends TestCase
             $book->favoriteBy($this->user);
         }
 
-        $this->getJson(route('api.me.favorites.index'))
+        $this->getJson(route('api.me.favorites.index', ['sort' => '-id']))
             ->assertSuccessful()
             ->assertJsonStructure([
                 'data' => [

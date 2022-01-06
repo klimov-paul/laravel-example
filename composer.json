@@ -20,7 +20,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/telescope": "^4.0.0",
         "laravel/tinker": "^2.5",
-        "mad-web/laravel-initializer": "^3.2.0"
+        "mad-web/laravel-initializer": "^3.2.0",
+        "spatie/laravel-query-builder": "^4.0.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",

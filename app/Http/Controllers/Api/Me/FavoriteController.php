@@ -9,6 +9,8 @@ use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Spatie\QueryBuilder\AllowedFilter;
+use Spatie\QueryBuilder\QueryBuilder;
 
 class FavoriteController extends Controller
 {
@@ -19,10 +21,16 @@ class FavoriteController extends Controller
 
     public function index()
     {
-        $favorites = $this->user()
-            ->favorites()
-            ->with('book')
-            ->orderBy('id', 'desc')
+        $favorites = QueryBuilder::for(
+            $this->user()
+                ->favorites()
+                ->with('book')
+        )
+            ->allowedFilters([
+                AllowedFilter::exact('id'),
+                AllowedFilter::partial('title', 'books.title'),
+            ])
+            ->allowedSorts(['id', 'created_at'])
             ->paginate();
 
         return FavoriteResource::collection($favorites);
