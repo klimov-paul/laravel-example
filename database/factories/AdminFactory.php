@@ -7,8 +7,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @method \App\Models\Admin|\App\Models\Admin[] make()
- * @method \App\Models\Admin|\App\Models\Admin[] create()
+ * @method \App\Models\Admin|\App\Models\Admin[] make(array $attributes = [])
+ * @method \App\Models\Admin|\App\Models\Admin[] create(array $attributes = [])
  */
 class AdminFactory extends Factory
 {

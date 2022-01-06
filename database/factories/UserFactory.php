@@ -8,16 +8,11 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
 /**
- * @method \App\Models\User|\App\Models\User[] make()
- * @method \App\Models\User|\App\Models\User[] create()
+ * @method \App\Models\User|\App\Models\User[] make(array $attributes = [])
+ * @method \App\Models\User|\App\Models\User[] create(array $attributes = [])
  */
 class UserFactory extends Factory
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected $model = User::class;
-
     /**
      * {@inheritdoc}
      */

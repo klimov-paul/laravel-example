@@ -5,8 +5,8 @@ namespace Database\Factories;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @method \App\Models\Book|\App\Models\Book[] make()
- * @method \App\Models\Book|\App\Models\Book[] create()
+ * @method \App\Models\Book|\App\Models\Book[] make(array $attributes = [])
+ * @method \App\Models\Book|\App\Models\Book[] create(array $attributes = [])
  */
 class BookFactory extends Factory
 {

@@ -2,9 +2,13 @@
 
 namespace App\Models;
 
+use App\Enums\CreditCardStatus;
+use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
 use App\Notifications\UserSignedUp;
 use Illuminate\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -26,6 +30,11 @@ use Laravel\Sanctum\HasApiTokens;
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @property \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\CreditCard[] $creditCards
+ * @property \App\Models\CreditCard|null $activeCreditCard
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Subscription[] $subscriptions
+ * @property \App\Models\Subscription|null $activeSubscription
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Favorite[] $favorites
  *
  * @method static \Illuminate\Database\Eloquent\Builder|static query()
  */
@@ -67,6 +76,38 @@ class User extends Authenticatable
     public function favorites()
     {
         return $this->hasMany(Favorite::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\CreditCard
+     */
+    public function creditCards(): HasMany
+    {
+        return $this->hasMany(CreditCard::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne|\App\Models\CreditCard
+     */
+    public function activeCreditCard(): HasOne
+    {
+        return $this->hasOne(CreditCard::class)->where('status', CreditCardStatus::ACTIVE);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Subscription
+     */
+    public function subscriptions(): HasMany
+    {
+        return $this->hasMany(Subscription::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne|\App\Models\Subscription
+     */
+    public function activeSubscription(): HasOne
+    {
+        return $this->hasOne(Subscription::class)->where('status', SubscriptionStatus::ACTIVE);
     }
 
     /**

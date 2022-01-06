@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Subscription represents particular user's subscription time period.
@@ -18,7 +20,12 @@ use Illuminate\Database\Eloquent\Model;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
+ * @property-read \App\Models\User $user
+ * @property-read \App\Models\SubscriptionPlan $subscriptionPlan
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Payment[] $payments
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|static query()
+ * @method static \Illuminate\Database\Eloquent\Builder|static expired()
  */
 class Subscription extends Model
 {
@@ -41,4 +48,33 @@ class Subscription extends Model
         'begin_at' => 'datetime',
         'end_at' => 'datetime',
     ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|\App\Models\User
+     */
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|\App\Models\SubscriptionPlan
+     */
+    public function subscriptionPlan(): BelongsTo
+    {
+        return $this->belongsTo(SubscriptionPlan::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Payment
+     */
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
+
+    public function scopeExpired(Builder $query)
+    {
+        return $query->where('end_at', '<', now());
+    }
 }
