@@ -1,6 +1,8 @@
 <?php
 
-namespace Tests\Support;
+namespace Tests\Support\Payment;
+
+use App\Services\Payment\Braintree;
 
 /**
  * BraintreeTrait provide set of helper methods for Braintree related tests.
@@ -48,5 +50,17 @@ trait BraintreeTrait
     public function validCreditCardNumber()
     {
         return '378282246310005';
+    }
+
+    /**
+     * @return \Tests\Support\Payment\BraintreeMock mock instance.
+     */
+    protected function mockBraintree(): BraintreeMock
+    {
+        $mock = new BraintreeMock();
+
+        $this->app->instance(Braintree::class, $mock);
+
+        return $mock;
     }
 }

@@ -12,7 +12,8 @@ use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
-use Tests\Support\BraintreeTrait;
+use Tests\Support\Payment\BraintreeMock;
+use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
 /**
@@ -34,6 +35,8 @@ class SubscriptionCheckoutTest extends TestCase
      */
     protected $subscriptionPlan;
 
+    protected BraintreeMock $paymentGatewayMock;
+
     /**
      * {@inheritdoc}
      */
@@ -42,6 +45,8 @@ class SubscriptionCheckoutTest extends TestCase
         parent::setUp();
 
         Event::fake();
+
+        $this->paymentGatewayMock = $this->mockBraintree();
 
         $this->skipOnBraintreeInvalidConfig();
 
@@ -59,6 +64,8 @@ class SubscriptionCheckoutTest extends TestCase
         $this->assertEquals($this->user->id, $subscription->user_id);
         $this->assertEquals($this->subscriptionPlan->id, $subscription->subscription_plan_id);
         $this->assertNotNull($this->user->activeCreditCard);
+
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activeCreditCard->external_id]);
 
         Event::assertDispatched(UserSubscribed::class, function (UserSubscribed $e) use ($subscription) {
             return $e->subscription->id === $subscription->id;
@@ -86,6 +93,8 @@ class SubscriptionCheckoutTest extends TestCase
         $subscription = $checkout->process();
 
         $this->assertEquals($this->user->id, $subscription->user_id);
+
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activeCreditCard->external_id]);
     }
 
     /**

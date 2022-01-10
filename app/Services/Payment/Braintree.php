@@ -58,7 +58,7 @@ class Braintree
         );
 
         if (! $response->success) {
-            throw new \RuntimeException('Unable to create Braintree customer: ' . $response->getMessage());
+            throw new \RuntimeException('Unable to create Braintree customer: ' . $response->message);
         }
 
         $paymentMethod = $response->customer->defaultPaymentMethod();
@@ -97,7 +97,7 @@ class Braintree
         ], $options));
 
         if (! $response->success) {
-            throw new \RuntimeException('Braintree was unable to perform a charge: ' . $response->getMessage());
+            throw new \RuntimeException('Braintree was unable to perform a charge: ' . $response->message);
         }
 
         return $response->transaction->jsonSerialize();

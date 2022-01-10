@@ -3,7 +3,7 @@
 namespace Tests\Unit\Services\Payment;
 
 use App\Services\Payment\Braintree;
-use Tests\Support\BraintreeTrait;
+use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
 /**

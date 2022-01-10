@@ -7,7 +7,7 @@ use App\Models\SubscriptionPlan;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Tests\Support\BraintreeTrait;
+use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
 /**
@@ -30,6 +30,8 @@ class SubscriptionsTest extends TestCase
     {
         parent::setUp();
 
+        $this->mockBraintree();
+
         $this->user = UserFactory::new()->create();
 
         $this->subscriptionPlan = SubscriptionPlanFactory::new()->create();
@@ -37,8 +39,6 @@ class SubscriptionsTest extends TestCase
 
     public function testSubscribe()
     {
-        $this->skipOnBraintreeInvalidConfig();
-
         $this->actingAs($this->user);
 
         $this->postJson(route('api.me.subscriptions.store'), [
