@@ -22,7 +22,7 @@ trait BraintreeTrait
             $this->markTestSkipped("Unable to run test while Braintree is not in 'sandbox' mode.");
         }
 
-        if (!config('services.braintree.merchant_id')) {
+        if (!config('services.braintree.merchantId')) {
             $this->markTestSkipped("'Merchant ID' configuration for Braintree is missing.");
         }
     }

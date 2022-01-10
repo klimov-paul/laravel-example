@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\Me;
 use App\Exceptions\PaymentException;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\SubscriptionResource;
+use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
 use App\Services\Subscription\SubscriptionCheckout;
@@ -54,6 +55,15 @@ class SubscriptionController extends Controller
                 'subscription' => new SubscriptionResource($subscription),
             ],
         ];
+    }
+
+    public function show(Subscription $subscription)
+    {
+        if ($subscription->user_id !== $this->user()->id) {
+            abort(404);
+        }
+
+        return new SubscriptionResource($subscription);
     }
 
     protected function user(): User

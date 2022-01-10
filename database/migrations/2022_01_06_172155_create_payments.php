@@ -14,12 +14,12 @@ class CreatePayments extends Migration
     public function up()
     {
         Schema::create('credit_cards', function (Blueprint $table) {
-            $table->increments('id');
+            $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('braintree_id')->nullable();
-            $table->string('paypal_email')->nullable();
-            $table->string('card_brand')->nullable();
-            $table->string('card_last_four')->nullable();
+            $table->string('external_id')->nullable();
+            $table->string('owner_email')->nullable();
+            $table->string('brand')->nullable();
+            $table->string('last_four')->nullable();
             $table->unsignedSmallInteger('status');
 
             $table->softDeletes();
@@ -54,8 +54,8 @@ class CreatePayments extends Migration
         });
 
         Schema::create('payment_has_subscription', function (Blueprint $table) {
-            $table->unsignedInteger('payment_id');
-            $table->unsignedInteger('subscription_id');
+            $table->unsignedBigInteger('payment_id');
+            $table->unsignedBigInteger('subscription_id');
 
             $table->foreign('payment_id')
                 ->references('id')

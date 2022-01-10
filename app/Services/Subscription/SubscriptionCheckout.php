@@ -64,7 +64,7 @@ class SubscriptionCheckout
 
                 $subscription = $this->subscriptionPlan->subscribe($this->user);
 
-                $subscription->payments()->append($payment);
+                $subscription->payments()->attach($payment->id);
             } else {
                 $subscription = $this->subscriptionPlan->subscribe($this->user);
             }

@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Services\Payment\Braintree;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -15,6 +16,10 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->bind('app.installer', \App\Initializers\Install::class);
         $this->app->bind('app.updater', \App\Initializers\Update::class);
+
+        $this->app->singleton(Braintree::class, function () {
+            return new Braintree($this->app->get('config')->get('services.braintree'));
+        });
     }
 
     /**

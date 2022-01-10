@@ -66,11 +66,11 @@ class Subscription extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Payment
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany|\App\Models\Payment
      */
     public function payments()
     {
-        return $this->hasMany(Payment::class);
+        return $this->belongsToMany(Payment::class, 'payment_has_subscription');
     }
 
     public function scopeExpired(Builder $query)

@@ -2,9 +2,10 @@
 
 namespace App\Models;
 
+use App\Services\Payment\Braintree;
 use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Laravel\Cashier\Billable;
+use Illuminate\Support\Facades\App;
 use App\Enums\PaymentType;
 use App\Enums\PaymentStatus;
 use App\Enums\CreditCardStatus;
@@ -18,10 +19,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $id
  * @property int $user_id
  * @property int $status
- * @property string $braintree_id
- * @property string $paypal_email
- * @property string $card_brand
- * @property string $card_last_four
+ * @property string $external_id
+ * @property string $owner_email
+ * @property string $brand
+ * @property string $last_four
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -34,16 +35,15 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CreditCard extends Model
 {
     use SoftDeletes;
-    use Billable;
 
     /**
      * {@inheritdoc}
      */
     protected $fillable = [
-        'braintree_id',
-        'paypal_email',
-        'card_brand',
-        'card_last_four',
+        'external_id',
+        'owner_email',
+        'brand',
+        'last_four',
         'status',
     ];
 
@@ -76,7 +76,9 @@ class CreditCard extends Model
 
         $this->status = CreditCardStatus::ACTIVE;
 
-        $this->createAsBraintreeCustomer($creditCardToken);
+        $this->user()->associate($user);
+
+        $this->createAsPaymentGatewayCustomer($creditCardToken);
 
         static::query()
             ->where('user_id', $user->id)
@@ -91,7 +93,6 @@ class CreditCard extends Model
 
     /**
      * Performs charge over this credit card, creating a `Payment` from results.
-     * @see https://developers.braintreepayments.com/reference/request/transaction/sale/php
      *
      * @param float $amount payment amount in major units, e.g. dollars
      * @param int $type payment type.
@@ -129,7 +130,7 @@ class CreditCard extends Model
                 'type' => $type,
                 'status' => PaymentStatus::FAILED,
                 'amount' => $amount,
-                'data' => ['error' => $e->getMessage()],
+                'details' => ['error' => $e->getMessage()],
             ], $attributes));
         }
 
@@ -137,7 +138,36 @@ class CreditCard extends Model
             'type' => $type,
             'status' => PaymentStatus::SUCCESS,
             'amount' => $amount,
-            'details' => $paymentResult->transaction,
+            'details' => json_encode($paymentResult),
         ], $attributes));
+    }
+
+    protected function createAsPaymentGatewayCustomer(string $paymentMethodNonce): self
+    {
+        $nameParts = explode(' ', $this->user->name);
+
+        $customerData = $this->paymentGateway()->createCustomer($paymentMethodNonce, [
+            'firstName' => $nameParts[0] ?? null,
+            'lastName' => $nameParts[1] ?? null,
+            'email' => $this->user->email,
+        ]);
+
+        $this->external_id = $customerData['customer_id'];
+        $this->owner_email = $customerData['paypal_email'];
+        $this->brand = $customerData['card_brand'];
+        $this->last_four = $customerData['card_last_four'];
+        $this->save();
+
+        return $this;
+    }
+
+    protected function charge($amount, array $options): array
+    {
+        return $this->paymentGateway()->charge($this->external_id, $amount, $options);
+    }
+
+    protected function paymentGateway(): Braintree
+    {
+        return App::get(Braintree::class);
     }
 }

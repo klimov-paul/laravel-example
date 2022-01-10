@@ -95,16 +95,6 @@ class SubscriptionsTest extends TestCase
                         'end_at',
                     ],
                 ],
-                'meta' => [
-                    'filter' => [
-                        'status' => [
-                            [
-                                'slug',
-                                'label',
-                            ],
-                        ],
-                    ],
-                ],
             ]);
     }
 
