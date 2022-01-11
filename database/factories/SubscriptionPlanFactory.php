@@ -19,6 +19,8 @@ class SubscriptionPlanFactory extends Factory
             'name' => $this->faker->unique()->word,
             'description' => $this->faker->unique()->text,
             'price' => $this->faker->unique()->randomFloat(2, 5, 10),
+            'max_book_price' => $this->faker->unique()->randomFloat(2, 100, 1000),
+            'max_rent_count' => 1,
         ];
     }
 }

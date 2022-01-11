@@ -20,7 +20,7 @@ class CreateRents extends Migration
             $table->unsignedSmallInteger('status');
             $table->timestamp('begin_at');
             $table->timestamp('due_at');
-            $table->timestamp('end_at');
+            $table->timestamp('end_at')->nullable();
             $table->timestamps();
 
             $table->foreign('user_id')

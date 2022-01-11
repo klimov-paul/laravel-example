@@ -35,6 +35,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Subscription[] $subscriptions
  * @property \App\Models\Subscription|null $activeSubscription
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Favorite[] $favorites
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Rent[] $rents
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Rent[] $currentRents
  *
  * @method static \Illuminate\Database\Eloquent\Builder|static query()
  */
@@ -108,6 +110,22 @@ class User extends Authenticatable
     public function activeSubscription(): HasOne
     {
         return $this->hasOne(Subscription::class)->where('status', SubscriptionStatus::ACTIVE);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Rent
+     */
+    public function rents(): HasMany
+    {
+        return $this->hasMany(Rent::class);
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\Rent
+     */
+    public function currentRents(): HasMany
+    {
+        return $this->rents()->current();
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\RentStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
@@ -59,5 +60,41 @@ class Book extends Model
             ->where('book_id', $this->id)
             ->where('user_id', $user->id)
             ->delete();
+    }
+
+    /**
+     * Creates pending rent of this book by given user.
+     *
+     * > Note: this method does not perform check whether rent is allowed or not.
+     *
+     * @param \App\Models\User $user
+     * @return \App\Models\Rent created rent.
+     */
+    public function rent(User $user): Rent
+    {
+        $rent = new Rent();
+        $rent->user()->associate($user);
+        $rent->book()->associate($this);
+        $rent->status = RentStatus::PENDING;
+        $rent->save();
+
+        return $rent;
+    }
+
+    public function allowRent(User $user): bool
+    {
+        if ($user->activeSubscription === null) {
+            return false;
+        }
+
+        if (!$user->activeSubscription->subscriptionPlan->allowBook($this)) {
+            return false;
+        }
+
+        if (!$user->activeSubscription->subscriptionPlan->hasAvailableRentSlots($user)) {
+            return false;
+        }
+
+        return $user->currentRents->where('book_id', $this->id)->count() < 1;
     }
 }

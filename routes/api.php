@@ -24,4 +24,6 @@ Route::name('me.')->middleware('auth:web')->group(function () {
     Route::apiResource('favorites', Me\FavoriteController::class)->except('update');
 
     Route::apiResource('subscriptions', Me\SubscriptionController::class)->except('update');
+
+    Route::apiResource('rents', Me\RentController::class)->except('update');
 });

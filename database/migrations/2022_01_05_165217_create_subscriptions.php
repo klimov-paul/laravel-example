@@ -18,6 +18,8 @@ class CreateSubscriptions extends Migration
             $table->string('name');
             $table->string('description');
             $table->decimal('price');
+            $table->decimal('max_book_price');
+            $table->unsignedSmallInteger('max_rent_count')->default(1);
             $table->softDeletes();
             $table->timestamps();
         });
