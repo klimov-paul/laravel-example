@@ -5,13 +5,10 @@ namespace Tests\Unit\Models;
 use Database\Factories\BookFactory;
 use Database\Factories\CategoryFactory;
 use Database\Factories\SubscriptionPlanFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 class SubscriptionPlanTest extends TestCase
 {
-    use DatabaseTransactions;
-
     public function testAllowBook()
     {
         $allowedCategory = CategoryFactory::new()->create();

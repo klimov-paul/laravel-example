@@ -6,7 +6,6 @@ use App\Models\User;
 use Database\Factories\BookFactory;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 /**
@@ -14,8 +13,6 @@ use Tests\TestCase;
  */
 class RentsTest extends TestCase
 {
-    use DatabaseTransactions;
-
     protected User $user;
 
     /**

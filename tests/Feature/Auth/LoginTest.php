@@ -4,7 +4,6 @@ namespace Tests\Feature\Auth;
 
 use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 /**
@@ -13,8 +12,6 @@ use Tests\TestCase;
  */
 class LoginTest extends TestCase
 {
-    use DatabaseTransactions;
-
     /**
      * @var \App\Models\User registered user mock
      */

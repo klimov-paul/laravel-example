@@ -6,7 +6,6 @@ use App\Models\User;
 use App\Models\SubscriptionPlan;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
@@ -17,7 +16,6 @@ use Tests\TestCase;
 class SubscriptionsTest extends TestCase
 {
     use BraintreeTrait;
-    use DatabaseTransactions;
 
     protected User $user;
 

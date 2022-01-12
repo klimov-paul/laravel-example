@@ -10,7 +10,6 @@ use App\Models\SubscriptionPlan;
 use App\Services\Subscription\SubscriptionCheckout;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 use Tests\Support\Payment\BraintreeMock;
 use Tests\Support\Payment\BraintreeTrait;
@@ -23,7 +22,6 @@ use Tests\TestCase;
 class SubscriptionCheckoutTest extends TestCase
 {
     use BraintreeTrait;
-    use DatabaseTransactions;
 
     /**
      * @var User test user instance.

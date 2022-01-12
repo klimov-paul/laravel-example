@@ -4,7 +4,6 @@ namespace Tests\Feature\Auth;
 
 use Database\Factories\UserFactory;
 use Illuminate\Auth\Notifications\ResetPassword;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
 use Tests\TestCase;
@@ -15,8 +14,6 @@ use Tests\TestCase;
  */
 class ForgotPasswordTest extends TestCase
 {
-    use DatabaseTransactions;
-
     /**
      * @var \App\Models\User registered user mock
      */

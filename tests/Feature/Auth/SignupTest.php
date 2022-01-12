@@ -5,7 +5,6 @@ namespace Tests\Feature\Auth;
 use App\Models\User;
 use App\Notifications\UserSignedUp;
 use Database\Factories\UserFactory;
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
@@ -15,8 +14,6 @@ use Tests\TestCase;
  */
 class SignupTest extends TestCase
 {
-    use DatabaseTransactions;
-
     /**
      * {@inheritdoc}
      */

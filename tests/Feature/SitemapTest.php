@@ -2,7 +2,6 @@
 
 namespace Tests\Feature;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Tests\TestCase;
 
 /**
@@ -10,8 +9,6 @@ use Tests\TestCase;
  */
 class SitemapTest extends TestCase
 {
-    use DatabaseTransactions;
-
     /**
      * {@inheritdoc}
      */
