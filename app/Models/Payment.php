@@ -44,7 +44,7 @@ class Payment extends Model
         return $this->belongsTo(CreditCard::class);
     }
 
-    public function getIsSuccessful(): bool
+    public function isSuccessful(): bool
     {
         return $this->status === PaymentStatus::SUCCESS;
     }

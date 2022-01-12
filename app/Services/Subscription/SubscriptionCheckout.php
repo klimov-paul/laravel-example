@@ -58,7 +58,7 @@ class SubscriptionCheckout
 
                 $payment = $this->user->activeCreditCard->pay($paymentAmount, PaymentType::SUBSCRIPTION);
 
-                if (!$payment->getIsSuccessful()) {
+                if (!$payment->isSuccessful()) {
                     throw new PaymentException('Unable to perform payment: '.$payment->getErrorMessage());
                 }
 

@@ -130,7 +130,7 @@ class CreditCard extends Model
                 'type' => $type,
                 'status' => PaymentStatus::FAILED,
                 'amount' => $amount,
-                'details' => ['error' => $e->getMessage()],
+                'details' => json_encode(['error' => $e->getMessage()]),
             ], $attributes));
         }
 
