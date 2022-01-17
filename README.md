@@ -6,6 +6,8 @@ Laravel example project used for common programming approaches demonstration.
 Project serves as on-line book library, when registered users can borrow a book for a limited time period.
 In order to use the library user should purchase a subscription, which requires recurring payment.
 
+Documentation is at [docs/README.md](docs/README.md).
+
 
 Requirements
 ------------
