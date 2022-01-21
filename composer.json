@@ -16,13 +16,13 @@
         "braintree/braintree_php": "^6.5.1",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "illuminatech/data-provider": "^1.0.0",
         "laravel/framework": "^8.75",
         "laravel/horizon": "^5.0.0",
         "laravel/sanctum": "^2.11",
         "laravel/telescope": "^4.0.0",
         "laravel/tinker": "^2.5",
-        "mad-web/laravel-initializer": "^3.2.0",
-        "spatie/laravel-query-builder": "^4.0.2"
+        "mad-web/laravel-initializer": "^3.2.0"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",

@@ -13,7 +13,7 @@ Obviously, we can allow direct operation of the `Builder` instance by client-sid
 security breach and catch an SQL injection.
 Data should be verified and sanitized before being used in query composition.
 
-To avoid code duplication for the listings you can use a separated library like [spatie/laravel-query-builder](https://github.com/spatie/laravel-query-builder).
+To avoid code duplication for the listings you can use a separated library like [illuminatech/data-provider](https://github.com/illuminatech/data-provider).
 Open [App\Http\Controllers\Api\BookController](../app/Http/Controllers/Api/BookController.php) see `index()`.
 
 Usually each listing has a single-time usage. It is unlikely to be reused anywhere else. For example: listing of "books"

@@ -8,14 +8,25 @@ use App\Models\User;
 use App\Rules\AllowBookRentRule;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminatech\DataProvider\DataProvider;
 
 class RentController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $rents = $this->user()
+        $rents = (new DataProvider($this->user()
             ->rents()
-            ->paginate();
+        ))
+            ->filters([
+                'id',
+                'search' => [
+                    'book.title',
+                    'book.description',
+                    'book.author',
+                ],
+            ])
+            ->sort(['id', 'created_at'])
+            ->paginate($request);
 
         return RentResource::collection($rents);
     }

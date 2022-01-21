@@ -9,8 +9,7 @@ use App\Models\Favorite;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
+use Illuminatech\DataProvider\DataProvider;
 
 class FavoriteController extends Controller
 {
@@ -19,19 +18,23 @@ class FavoriteController extends Controller
         return Auth::guard('web')->user();
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $favorites = QueryBuilder::for(
+        $favorites = (new DataProvider(
             $this->user()
                 ->favorites()
                 ->with('book')
-        )
-            ->allowedFilters([
-                AllowedFilter::exact('id'),
-                AllowedFilter::partial('title', 'books.title'),
+        ))
+            ->filters([
+                'id',
+                'search' => [
+                    'book.title',
+                    'book.description',
+                    'book.author',
+                ],
             ])
-            ->allowedSorts(['id', 'created_at'])
-            ->paginate();
+            ->sort(['id', 'created_at'])
+            ->paginate($request);
 
         return FavoriteResource::collection($favorites);
     }

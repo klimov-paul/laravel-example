@@ -25,6 +25,47 @@ class RentsTest extends TestCase
         $this->user = UserFactory::new()->create();
     }
 
+    public function testIndex()
+    {
+        $this->actingAs($this->user);
+
+        $books = BookFactory::new()->count(2)->create();
+
+        foreach ($books as $book) {
+            $book->rent($this->user);
+        }
+
+        $this->getJson(route('api.me.rents.index', ['sort' => '-id']))
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'data' => [
+                    [
+                        'id',
+                        'created_at',
+                        'book' => [
+                            'id',
+                            'title',
+                        ],
+                    ],
+                ],
+            ])
+            ->assertJsonCount(2, 'data')
+            ->assertJson([
+                'data' => [
+                    [
+                        'book' => [
+                            'id' => $books[1]->id,
+                        ],
+                    ],
+                    [
+                        'book' => [
+                            'id' => $books[0]->id,
+                        ],
+                    ],
+                ],
+            ]);
+    }
+
     public function testStore()
     {
         $this->actingAs($this->user);

@@ -5,22 +5,28 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\BookResource;
 use App\Models\Book;
-use Spatie\QueryBuilder\AllowedFilter;
-use Spatie\QueryBuilder\QueryBuilder;
+use Illuminate\Http\Request;
+use Illuminatech\DataProvider\DataProvider;
 
 class BookController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $books = QueryBuilder::for(Book::query())
-            ->allowedFilters([
-                'title',
-                'description',
-                'author',
-                AllowedFilter::exact('id'),
+        $books = (new DataProvider(Book::query()))
+            ->filters([
+                'id',
+                'search' => [
+                    'title',
+                    'description',
+                    'author',
+                ],
             ])
-            ->allowedSorts(['id', 'title', 'price'])
-            ->paginate();
+            ->sort([
+                'id',
+                'title',
+                'price',
+            ])
+            ->paginate($request);
 
         return BookResource::collection($books);
     }

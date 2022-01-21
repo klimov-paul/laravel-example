@@ -15,7 +15,7 @@ class BookFactory extends Factory
      */
     public function definition()
     {
-        $title = $this->faker->title();
+        $title = $this->faker->unique()->title() . ' ' . $this->faker->name();
 
         return [
             'isbn' => uniqid(),

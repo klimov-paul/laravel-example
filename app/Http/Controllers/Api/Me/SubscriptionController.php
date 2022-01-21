@@ -11,20 +11,20 @@ use App\Models\User;
 use App\Services\Subscription\SubscriptionCheckout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Spatie\QueryBuilder\QueryBuilder;
+use Illuminatech\DataProvider\DataProvider;
 
 class SubscriptionController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $subscriptions = QueryBuilder::for(
+        $subscriptions = (new DataProvider(
             $this->user()
                 ->subscriptions()
                 ->with('subscriptionPlan')
-        )
-            ->allowedSorts(['id', 'subscription_plan_id', 'created_at'])
-            ->defaultSort('-id')
-            ->paginate();
+        ))
+            ->sort(['id', 'subscription_plan_id', 'created_at'])
+            ->sortDefault('-id')
+            ->paginate($request);
 
         return SubscriptionResource::collection($subscriptions);
     }
