@@ -46,8 +46,6 @@ class SubscriptionCheckoutTest extends TestCase
 
         $this->paymentGatewayMock = $this->mockBraintree();
 
-        $this->skipOnBraintreeInvalidConfig();
-
         $this->user = UserFactory::new()->create();
 
         $this->subscriptionPlan = SubscriptionPlanFactory::new()->create();

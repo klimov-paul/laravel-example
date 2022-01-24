@@ -46,7 +46,7 @@ For the external service PHPDoc should always provide a links to its official do
 
 It is recommended to always use a full qualified name of the class inside PHPDoc, e.g. use `\Illuminate\Support\Collection`
 instead of simply `Collection`. In this way you will avoid unnecessary `use` statements and avoid troubles during
-refactoring in case you move class across directory strucutre.
+refactoring in case you move class across directory structure.
 
 
 ### Active Record
@@ -101,10 +101,19 @@ php artisan ide-helper:models
 
 but you need to extract it from there and save in actual model's file.
 
+
 ### JSON Resources
 
 See [App\Http\Resources\BookResource](../app/Http/Resources/BookResource.php).
 It is better to define PHPDoc for `$resource` property and use long access `$this-resource->id`.
+
+
+### Inherit Doc
+
+Always use tag `@inheritdoc` for all overridden fields and methods. This indicates that particular field or method declaration
+is provided by the parent class and redeclared to satisfy it. Absence of the `@inheritdoc` clearly indicates that particular entity
+was created for the dedicated purpose.
+See [App\Models\User](../app/Models/User.php) for example.
 
 
 ### View Files
