@@ -20,10 +20,7 @@ mix.webpackConfig({
 });
 
 mix.js('resources/js/app.js', 'public/js').vue()
-    .postCss('resources/css/app.css', 'public/css', [
-        require('postcss-import'),
-        require('tailwindcss'),
-    ]);
+    .sass('resources/scss/app.scss', 'public/css/app.css');
 
 if (mix.inProduction()) {
     mix.version();

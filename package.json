@@ -9,15 +9,15 @@
         "prod": "npm run production",
         "production": "mix --production"
     },
-    "devDependencies": {
-        "@tailwindcss/forms": "^0.4.0",
-        "@tailwindcss/typography": "^0.5.0",
+    "dependencies": {
+        "@popperjs/core": "^2.11.2",
         "axios": "^0.21",
+        "bootstrap": "^5.0.0",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
-        "postcss": "^8.1.14",
-        "postcss-import": "^12.0.1",
-        "tailwindcss": "^3.0.0",
+        "resolve-url-loader": "^4.0.0",
+        "sass": "^1.49.0",
+        "sass-loader": "^12.1.0",
         "vue": "^3.0.5",
         "vue-loader": "^16.2.0"
     }
