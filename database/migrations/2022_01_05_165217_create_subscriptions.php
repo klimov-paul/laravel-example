@@ -25,8 +25,8 @@ class CreateSubscriptions extends Migration
         });
 
         Schema::create('subscription_plan_has_category', function (Blueprint $table) {
-            $table->unsignedBigInteger('subscription_plan_id')->index();
-            $table->unsignedBigInteger('category_id')->index();
+            $table->unsignedBigInteger('subscription_plan_id');
+            $table->unsignedBigInteger('category_id');
 
             $table->primary(['subscription_plan_id', 'category_id'], 'subscription_plan_has_category_primary');
 

@@ -37,8 +37,8 @@ class CreateBooks extends Migration
         });
 
         Schema::create('book_has_category', function (Blueprint $table) {
-            $table->unsignedBigInteger('book_id')->index();
-            $table->unsignedBigInteger('category_id')->index();
+            $table->unsignedBigInteger('book_id');
+            $table->unsignedBigInteger('category_id');
 
             $table->primary(['book_id', 'category_id']);
 
