@@ -23,3 +23,6 @@ Route::name('auth.')->group(function () {
     Route::get('email/verify/{user}', Auth\EmailController::class.'@verify')->name('email.verify');
     Route::get('email', Auth\EmailController::class.'@showRequestForm')->name('email.form');
 });
+
+Route::get('books', BookController::class.'@index')->name('books.index');
+Route::get('rents', RentController::class.'@index')->name('rents.index');

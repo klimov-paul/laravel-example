@@ -1,0 +1,9 @@
+@breadcrumbs([
+    'Books'
+])
+@extends('layouts.main')
+@section('content')
+    <div>
+        Books
+    </div>
+@endsection
