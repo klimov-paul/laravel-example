@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Enums\AdminPermissionEnum;
+use App\Gates\AdminPermission;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 use Illuminate\Support\Facades\Gate;
 
@@ -13,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      * @var array<class-string, class-string>
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        // \App\Models\Model::class => \App\Policies\ModelPolicy::class,
     ];
 
     /**
@@ -25,6 +27,10 @@ class AuthServiceProvider extends ServiceProvider
     {
         $this->registerPolicies();
 
-        //
+        foreach (AdminPermissionEnum::getInstances() as $permission) {
+            Gate::define($permission->ability(), function (object $admin) use ($permission) {
+                return AdminPermission::check($admin, $permission);
+            });
+        }
     }
 }

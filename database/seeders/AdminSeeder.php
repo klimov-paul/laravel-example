@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\AdminRoleEnum;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -18,6 +19,7 @@ class AdminSeeder extends Seeder
                 'name' => 'admin',
                 'email' => 'admin@example.com',
                 'password' => bcrypt('secret'),
+                'role' => AdminRoleEnum::MASTER_ADMIN,
                 'remember_token' => '',
                 'created_at' => now(),
                 'updated_at' => now(),

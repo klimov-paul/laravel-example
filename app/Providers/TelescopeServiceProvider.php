@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Enums\AdminPermissionEnum;
 use Illuminate\Support\Facades\Gate;
 use Laravel\Telescope\IncomingEntry;
 use Laravel\Telescope\Telescope;
@@ -67,7 +68,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                 return true;
             }
 
-            $user = $request->user('admin');
+            $user = $request->user('web-admin');
 
             if (empty($user)) {
                 return false;
@@ -83,7 +84,7 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
     protected function gate()
     {
         Gate::define('viewTelescope', function ($user) {
-            return true;
+            return $user->can(AdminPermissionEnum::TELESCOPE()->ability());
         });
     }
 }
