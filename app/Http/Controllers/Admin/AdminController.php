@@ -12,7 +12,7 @@ class AdminController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('can:' . AdminPermissionEnum::ADMINS()->ability());
+        $this->authorize(AdminPermissionEnum::ADMINS()->ability());
     }
 
     public function index(Request $request)

@@ -33,3 +33,10 @@ Unit Tests
 * [How Unit Tests Organize the Code](tests-how-unit-tests-organize-code.md)
 * [Database Testing](tests-database.md)
 * [Mock External Dependencies](tests-mock-external-dependencies.md)
+
+
+Authorization
+-------------
+
+* [Gates](authorization-gates.md)
+* [Policies](authorization-policies.md)
