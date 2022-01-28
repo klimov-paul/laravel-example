@@ -16,7 +16,7 @@
         "braintree/braintree_php": "^6.5.1",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
-        "illuminatech/data-provider": "^1.0.0",
+        "illuminatech/data-provider": "^1.0.1",
         "laravel/framework": "^8.75",
         "laravel/horizon": "^5.0.0",
         "laravel/sanctum": "^2.11",
