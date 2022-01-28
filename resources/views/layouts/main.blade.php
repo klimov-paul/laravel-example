@@ -6,6 +6,7 @@
 
     <title>@yield('meta-title') | {{ config('app.name') }}</title>
     <meta name="description" content="@yield('meta-description', config('app.name'))" />
+    <meta name="robots" content="@yield('meta-robots', config('appearance.allow_robots') ? 'index,follow' : 'noindex,nofollow')" />
     @stack('meta')
 
     <meta name="application-name" content="{{ config('app.name') }}">
