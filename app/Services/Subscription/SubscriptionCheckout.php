@@ -94,7 +94,7 @@ class SubscriptionCheckout
             return $this->subscriptionPlan->price;
         }
 
-        $now = now();
+        $now = now()->startOfDay();
 
         if ($now->gte($this->user->activeSubscription->end_at)) {
             return $this->subscriptionPlan->price;
