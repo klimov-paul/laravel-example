@@ -10,6 +10,13 @@ class Handler extends ExceptionHandler
     /**
      * {@inheritdoc}
      */
+    protected $levels = [
+        //
+    ];
+
+    /**
+     * {@inheritdoc}
+     */
     protected $dontReport = [
         //
     ];

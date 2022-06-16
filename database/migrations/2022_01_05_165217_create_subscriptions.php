@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateSubscriptions extends Migration
+return new class extends Migration
 {
     /**
      * Run the migrations.
@@ -80,4 +80,4 @@ class CreateSubscriptions extends Migration
         Schema::dropIfExists('subscription_plan_has_category');
         Schema::dropIfExists('subscription_plans');
     }
-}
+};
