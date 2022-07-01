@@ -27,7 +27,7 @@
 
     <!-- Styles -->
     @stack('before-styles')
-    <link href="{{ asset(mix('css/app.css')) }}" rel="stylesheet">
+    @vite('resources/scss/app.scss')
     @stack('after-styles')
 </head>
 <body>
@@ -38,7 +38,7 @@
     </div>
     <!-- Scripts -->
     @stack('before-scripts')
-    <script src="{{ asset(mix('js/app.js')) }}"></script>
+    @vite('resources/js/app.js')
     @stack('after-scripts')
 </body>
 </html>

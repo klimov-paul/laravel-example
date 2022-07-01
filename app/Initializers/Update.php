@@ -14,7 +14,7 @@ class Update
     {
         $run->external('composer', 'install', '--no-dev', '--prefer-dist', '--optimize-autoloader')
             ->external('yarn', 'install', '--production')
-            ->external('yarn', 'run', 'production');
+            ->external('yarn', 'run', 'build');
 
         $this->common($run);
 
@@ -27,7 +27,7 @@ class Update
     {
         $run->external('composer', 'install')
             ->external('yarn', 'install')
-            ->external('yarn', 'run', 'development');
+            ->external('yarn', 'run', 'build');
 
         $this->common($run);
 

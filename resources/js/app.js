@@ -1,3 +1,3 @@
-require('./bootstrap');
+import './bootstrap';
 
-require('bootstrap/js/src/dropdown');
+import 'bootstrap/js/src/dropdown';

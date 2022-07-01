@@ -34,6 +34,7 @@ composer.phar
 /public/storage
 /public/media
 /public/vendor
+/public/build
 /public/mix-manifest.json
 package-lock.json
 npm-debug.log
