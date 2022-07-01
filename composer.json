@@ -15,6 +15,7 @@
         "braintree/braintree_php": "^6.5.1",
         "guzzlehttp/guzzle": "^7.2",
         "illuminatech/data-provider": "^1.0.3",
+        "illuminatech/model-rules": "^1.0.0",
         "laravel/framework": "^9.11",
         "laravel/horizon": "^5.9.7",
         "laravel/sanctum": "^2.14.1",

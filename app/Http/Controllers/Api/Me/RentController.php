@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Me;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\RentResource;
+use App\Models\Rent;
 use App\Models\User;
 use App\Rules\AllowBookRentRule;
 use Illuminate\Http\Request;

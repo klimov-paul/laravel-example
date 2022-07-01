@@ -12,6 +12,7 @@ use App\Services\Subscription\SubscriptionCheckout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminatech\DataProvider\DataProvider;
+use Illuminatech\ModelRules\Exists;
 
 class SubscriptionController extends Controller
 {
@@ -32,13 +33,13 @@ class SubscriptionController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'subscription_plan_id' => ['required', 'integer', 'exists:subscription_plans,id'],
+            'subscription_plan_id' => ['required', 'integer', $subscriptionPlanRule = Exists::new(SubscriptionPlan::class)],
             'token' => ['sometimes', 'required', 'string'],
             'accept_terms' => ['required', 'accepted'],
         ]);
 
-        $subscriptionPlan = SubscriptionPlan::query()
-            ->findOrFail($validatedData['subscription_plan_id']);
+        /** @var SubscriptionPlan $subscriptionPlan */
+        $subscriptionPlan = $subscriptionPlanRule->getModel();
 
         try {
             $checkout = new SubscriptionCheckout($request->user(), $subscriptionPlan);

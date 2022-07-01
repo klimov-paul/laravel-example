@@ -10,6 +10,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminatech\DataProvider\DataProvider;
+use Illuminatech\ModelRules\Exists;
 
 class FavoriteController extends Controller
 {
@@ -42,10 +43,11 @@ class FavoriteController extends Controller
     public function store(Request $request)
     {
         $data = $this->validate($request, [
-            'book_id' => ['required', 'int', 'exists:books,id'],
+            'book_id' => ['required', 'int', $bookRule = Exists::new(Book::class)],
         ]);
 
-        $book = Book::query()->findOrFail($data['book_id']);
+        /** @var Book $book */
+        $book = $bookRule->getModel();
 
         $favorite = $book->favoriteBy($this->user());
 

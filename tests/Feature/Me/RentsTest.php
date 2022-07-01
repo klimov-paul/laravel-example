@@ -98,4 +98,33 @@ class RentsTest extends TestCase
 
         $this->assertTrue($this->user->rents()->where('book_id', $book->id)->exists());
     }
+
+    public function testShow()
+    {
+        $this->actingAs($this->user);
+
+        $book = BookFactory::new()->create();
+
+        $rent = $book->rent($this->user);
+
+        $this->getJson(route('api.me.rents.show', [$rent]))
+            ->assertSuccessful()
+            ->assertJsonStructure([
+                'data' => [
+                    'id',
+                    'created_at',
+                    'book' => [
+                        'id',
+                    ],
+                ],
+            ])
+            ->assertJson([
+                'data' => [
+                    'id' => $rent->id,
+                    'book' => [
+                        'id' => $book->id,
+                    ],
+                ],
+            ]);
+    }
 }
