@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\DB;
 
 class AdminSeeder extends Seeder
 {
-    public function run()
+    public function run(): void
     {
         if (DB::table('admins')->count() > 0) {
             return;
