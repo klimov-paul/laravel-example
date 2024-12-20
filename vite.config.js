@@ -4,10 +4,10 @@ import vue from '@vitejs/plugin-vue';
 
 export default defineConfig({
     plugins: [
-        laravel([
-            'resources/scss/app.scss',
-            'resources/js/app.js',
-        ]),
+        laravel({
+            input: ["resources/scss/app.scss", "resources/js/app.js"],
+            refresh: true,
+        }),
         vue({
             template: {
                 transformAssetUrls: {
@@ -19,7 +19,8 @@ export default defineConfig({
     ],
     resolve: {
         alias: {
-            '@': '/resources/js'
+            '@': '/resources/js',
+            vue: "vue/dist/vue.esm-bundler.js",
         }
     }
 });
