@@ -27,7 +27,12 @@
                         <li><a class="dropdown-item" href="#">Action</a></li>
                         <li><a class="dropdown-item" href="#">Another action</a></li>
                         <li><hr class="dropdown-divider"></li>
-                        <li><a class="dropdown-item" href="#">Logout</a></li>
+                        <li>
+                            <form action="{{ route('api.auth.logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="btn">Logout</button>
+                            </form>
+                        </li>
                     </ul>
                 </li>
                 @else
