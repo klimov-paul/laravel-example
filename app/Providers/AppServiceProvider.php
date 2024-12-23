@@ -15,9 +15,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('app.installer', \App\Initializers\Install::class);
-        $this->app->bind('app.updater', \App\Initializers\Update::class);
-
         $this->app->singleton(Braintree::class, function () {
             return new Braintree($this->app->get('config')->get('services.braintree'));
         });

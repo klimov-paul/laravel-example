@@ -1,6 +1,12 @@
 @extends('layouts.main')
 @section('content')
-    <div>
-        Home
-    </div>
+    @auth('web')
+        <div>
+            <a class="btn btn-primary" href="{{ route('me.subscriptions.purchase') }}">Purchase Subscription</a>
+        </div>
+    @else
+        <div>
+            Home
+        </div>
+    @endauth
 @endsection

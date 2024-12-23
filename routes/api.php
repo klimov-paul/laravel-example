@@ -28,3 +28,5 @@ Route::name('me.')->prefix('me')->middleware('auth:web')->group(function () {
 
     Route::apiResource('rents', Me\RentController::class)->except('update');
 });
+
+Route::post('braintree/generate-token', BraintreeController::class . '@generateClientToken')->name('braintree.generate-client-token');

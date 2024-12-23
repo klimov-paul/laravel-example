@@ -23,6 +23,7 @@ use Braintree\Result\Successful;
  * @see https://articles.braintreepayments.com/get-started/try-it-out
  * @see https://www.braintreepayments.com/sandbox
  * @see https://github.com/braintree/braintree_php
+ * @see https://developer.paypal.com/braintree/docs/start/hello-server/php
  */
 class Braintree
 {
@@ -31,6 +32,21 @@ class Braintree
     public function __construct(array $config)
     {
         $this->gateway = new Gateway($config);
+    }
+
+    /**
+     * Generates new client token, which should be passed to API client (e.g. JavaScript).
+     *
+     * @see https://developer.paypal.com/braintree/docs/start/hello-client/javascript/v3/
+     *
+     * @param int|null $customerId
+     * @return string client token.
+     */
+    public function generateClientToken($customerId = null): string
+    {
+        return $this->gateway->clientToken()->generate([
+            'customerId' => $customerId,
+        ]);
     }
 
     /**

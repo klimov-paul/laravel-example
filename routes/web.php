@@ -26,3 +26,9 @@ Route::name('auth.')->group(function () {
 
 Route::get('books', BookController::class.'@index')->name('books.index');
 Route::get('rents', RentController::class.'@index')->name('rents.index');
+
+Route::name('me.')->prefix('subscriptions')->group(function () {
+    Route::name('subscriptions.')->group(function () {
+        Route::get('purchase', Me\SubscriptionController::class . '@purchase')->name('purchase');
+    });
+});
