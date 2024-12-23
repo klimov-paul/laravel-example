@@ -34,7 +34,7 @@ class SubscriptionController extends Controller
     {
         $validatedData = $request->validate([
             'subscription_plan_id' => ['required', 'integer', $subscriptionPlanRule = Exists::new(SubscriptionPlan::class)],
-            'token' => ['sometimes', 'required', 'string'],
+            'nonce' => ['sometimes', 'required', 'string'],
             'accept_terms' => ['required', 'accepted'],
         ]);
 
@@ -43,7 +43,7 @@ class SubscriptionController extends Controller
 
         try {
             $checkout = new SubscriptionCheckout($request->user(), $subscriptionPlan);
-            $subscription = $checkout->process($validatedData['token'] ?? null);
+            $subscription = $checkout->process($validatedData['nonce'] ?? null);
         } catch (PaymentException $e) {
             return response()->json([
                 'message' => $e->getMessage(),

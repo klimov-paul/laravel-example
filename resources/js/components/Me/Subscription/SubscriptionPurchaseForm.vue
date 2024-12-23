@@ -51,15 +51,20 @@
     </form>
 </template>
 <script>
-import AjaxForm from '@/mixins/AjaxForm';
 import axios from 'axios';
+import dropin from 'braintree-web-drop-in';
 
 export default {
     name: "SubscriptionPurchaseForm",
-    mixins: [
-        AjaxForm,
-    ],
     props: {
+        action: {
+            type: String,
+            default: () => null,
+        },
+        method: {
+            type: String,
+            default: () => 'POST',
+        },
         subscriptionPlansApiUrl: {
             type: String,
             default: () => null,
@@ -72,11 +77,14 @@ export default {
     data() {
         return {
             subscriptionPlans: [],
+            braintreeDropin: {},
             formData: {
                 subscription_plan_id: '',
-                token: '',
+                nonce: '',
                 accept_terms: false,
             },
+            errors: {},
+            loading: false,
         };
     },
     created() {
@@ -104,22 +112,86 @@ export default {
 
             let clientToken = response.data.data.token;
 
-            braintree.dropin.create({
-                // Step three: get client token from your server, such as via
-                //    templates or async http request
+            dropin.create({
                 authorization: clientToken,
-                container: '#braintree-dropin-container'
+                container: '#braintree-dropin-container',
+                paypal: {
+                    flow: 'checkout',
+                    buttonStyle: {
+                        color: 'blue',
+                        shape: 'rect',
+                        size: 'medium'
+                    }
+                }
             }).then((dropinInstance) => {
                 // Use 'dropinInstance' here
                 // Methods documented at https://braintree.github.io/braintree-web-drop-in/docs/current/Dropin.html
+                this.braintreeDropin = dropinInstance;
             }).catch((error) => {
                 console.error(error);
             });
 
             this.loading = false;
         },
+        send() {
+            if (this.loading) {
+                return;
+            }
+
+            this.loading = true;
+            this.errors = {};
+
+            this.braintreeDropin.requestPaymentMethod(function (err, payload) {
+                if (err) {
+                    // Handle error
+                    console.error(err);
+
+                    return;
+                }
+
+                this.formData.nonce = payload.nonce;
+                //this.formData.deviceData = payload.deviceData;
+            });
+
+            axios
+                .request({
+                    method: this.method,
+                    url: this.action,
+                    data: this.formData
+                })
+                .then(res => {
+                    if (res.data.redirect) {
+                        window.location = res.data.redirect;
+                        return;
+                    }
+
+                    if (this.success(res) === true) {
+                        return;
+                    }
+
+                    this.loading = false;
+                })
+                .catch(error => {
+                    if (this.error(error.response) === true) {
+                        return;
+                    }
+
+                    if (error.response.status === 422) {
+                        this.errors = error.response.data.errors;
+                        this.loading = false;
+
+                        return;
+                    }
+
+                    this.loading = false;
+                    console.error(error);
+                });
+        },
         success(response) {
             window.location = '/';
+        },
+        error(response) {
+            // blank
         },
     }
 }

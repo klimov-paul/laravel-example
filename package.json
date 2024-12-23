@@ -8,6 +8,8 @@
         "@popperjs/core": "^2.11.2",
         "axios": "^0.21",
         "bootstrap": "^5.0.0",
+        "braintree-web": "^3.42.0",
+        "braintree-web-drop-in": "^1.14.1",
         "laravel-vite-plugin": "^1.0",
         "lodash": "^4.17.19",
         "postcss": "^8.1.14",

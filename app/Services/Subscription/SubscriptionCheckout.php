@@ -39,13 +39,13 @@ class SubscriptionCheckout
         $this->subscriptionPlan = $subscriptionPlan;
     }
 
-    public function process($creditCardToken = null): Subscription
+    public function process($paymentMethodNonce = null): Subscription
     {
         DB::beginTransaction();
 
         try {
-            if ($creditCardToken) {
-                (new CreditCard())->createForUser($this->user, $creditCardToken);
+            if ($paymentMethodNonce) {
+                (new CreditCard())->createForUser($this->user, $paymentMethodNonce);
             }
 
             $isNewSubscription = ($this->user->activeSubscription === null);
