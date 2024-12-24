@@ -116,7 +116,7 @@ export default {
                 authorization: clientToken,
                 container: '#braintree-dropin-container',
                 paypal: {
-                    flow: 'checkout',
+                    flow: 'vault',
                     buttonStyle: {
                         color: 'blue',
                         shape: 'rect',
