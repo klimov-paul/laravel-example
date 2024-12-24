@@ -141,49 +141,46 @@ export default {
             this.loading = true;
             this.errors = {};
 
-            this.braintreeDropin.requestPaymentMethod(function (err, payload) {
-                if (err) {
-                    // Handle error
-                    console.error(err);
+            this.braintreeDropin
+                .requestPaymentMethod()
+                .then(payload => {
+                    this.formData.nonce = payload.nonce;
 
-                    return;
-                }
+                    axios
+                        .request({
+                            method: this.method,
+                            url: this.action,
+                            data: this.formData
+                        })
+                        .then(res => {
+                            if (res.data.redirect) {
+                                window.location = res.data.redirect;
+                                return;
+                            }
 
-                this.formData.nonce = payload.nonce;
-                //this.formData.deviceData = payload.deviceData;
-            });
+                            if (this.success(res) === true) {
+                                return;
+                            }
 
-            axios
-                .request({
-                    method: this.method,
-                    url: this.action,
-                    data: this.formData
-                })
-                .then(res => {
-                    if (res.data.redirect) {
-                        window.location = res.data.redirect;
-                        return;
-                    }
+                            this.loading = false;
+                        })
+                        .catch(error => {
+                            if (this.error(error.response) === true) {
+                                return;
+                            }
 
-                    if (this.success(res) === true) {
-                        return;
-                    }
+                            if (error.response.status === 422) {
+                                this.errors = error.response.data.errors;
+                                this.loading = false;
 
-                    this.loading = false;
+                                return;
+                            }
+
+                            this.loading = false;
+                            console.error(error);
+                        });
                 })
                 .catch(error => {
-                    if (this.error(error.response) === true) {
-                        return;
-                    }
-
-                    if (error.response.status === 422) {
-                        this.errors = error.response.data.errors;
-                        this.loading = false;
-
-                        return;
-                    }
-
-                    this.loading = false;
                     console.error(error);
                 });
         },
