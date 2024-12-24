@@ -18,7 +18,7 @@ class PaymentFactory extends Factory
     public function definition()
     {
         return [
-            'credit_card_id' => null, // must be passed explicitly on factory call
+            'payment_method_id' => null, // must be passed explicitly on factory call
             'type' => PaymentType::SUBSCRIPTION,
             'status' => PaymentStatus::SUCCESS,
             'amount' => $this->faker->randomFloat(2, 10, 100),

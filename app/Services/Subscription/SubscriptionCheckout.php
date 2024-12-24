@@ -3,7 +3,7 @@
 namespace App\Services\Subscription;
 
 use App\Events\Subscription\UserSubscribed;
-use App\Models\CreditCard;
+use App\Models\PaymentMethod;
 use Throwable;
 use App\Models\User;
 use App\Enums\PaymentType;
@@ -45,18 +45,18 @@ class SubscriptionCheckout
 
         try {
             if ($paymentMethodNonce) {
-                (new CreditCard())->createForUser($this->user, $paymentMethodNonce);
+                (new PaymentMethod())->createForUser($this->user, $paymentMethodNonce);
             }
 
             $isNewSubscription = ($this->user->activeSubscription === null);
 
             $paymentAmount = $this->calculatePaymentAmount();
             if ($paymentAmount > 0) {
-                if ($this->user->activeCreditCard === null) {
+                if ($this->user->activePaymentMethod === null) {
                     throw new PaymentException('Unable to perform payment: there is no credit card available.');
                 }
 
-                $payment = $this->user->activeCreditCard->pay($paymentAmount, PaymentType::SUBSCRIPTION);
+                $payment = $this->user->activePaymentMethod->pay($paymentAmount, PaymentType::SUBSCRIPTION);
 
                 if (!$payment->isSuccessful()) {
                     throw new PaymentException('Unable to perform payment: '.$payment->getErrorMessage());

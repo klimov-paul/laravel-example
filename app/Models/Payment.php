@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @property int $id
  * @property int $user_id
+ * @property int $payment_method_id
  * @property int $type
  * @property int $status
  * @property float $amount
@@ -18,7 +19,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
- * @property-read \App\Models\CreditCard $creditCard
+ * @property-read \App\Models\PaymentMethod $paymentMethod
  *
  * @method static \Illuminate\Database\Eloquent\Builder|static query()
  * @method static \Illuminate\Database\Eloquent\Builder|static expired()
@@ -30,6 +31,7 @@ class Payment extends Model
      */
     protected $fillable = [
         'user_id',
+        'payment_method_id',
         'type',
         'status',
         'amount',
@@ -37,11 +39,11 @@ class Payment extends Model
     ];
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|\App\Models\CreditCard
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo|\App\Models\PaymentMethod
      */
-    public function creditCard(): BelongsTo
+    public function paymentMethod(): BelongsTo
     {
-        return $this->belongsTo(CreditCard::class);
+        return $this->belongsTo(PaymentMethod::class);
     }
 
     public function isSuccessful(): bool

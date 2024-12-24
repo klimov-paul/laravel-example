@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\CreditCardStatus;
+use App\Enums\PaymentMethodStatus;
 use App\Enums\SubscriptionStatus;
 use App\Enums\UserStatus;
 use App\Notifications\UserSignedUp;
@@ -30,8 +30,8 @@ use Laravel\Sanctum\HasApiTokens;
  * @property \Illuminate\Support\Carbon|null $updated_at
  *
  * @property \Illuminate\Database\Eloquent\Collection|\Laravel\Sanctum\PersonalAccessToken[] $tokens
- * @property \Illuminate\Database\Eloquent\Collection|\App\Models\CreditCard[] $creditCards
- * @property \App\Models\CreditCard|null $activeCreditCard
+ * @property \Illuminate\Database\Eloquent\Collection|\App\Models\PaymentMethod[] $paymentMethods
+ * @property \App\Models\PaymentMethod|null $activePaymentMethod
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Subscription[] $subscriptions
  * @property \App\Models\Subscription|null $activeSubscription
  * @property \Illuminate\Database\Eloquent\Collection|\App\Models\Favorite[] $favorites
@@ -81,19 +81,19 @@ class User extends Authenticatable
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\CreditCard
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany|\App\Models\PaymentMethod
      */
-    public function creditCards(): HasMany
+    public function paymentMethods(): HasMany
     {
-        return $this->hasMany(CreditCard::class);
+        return $this->hasMany(PaymentMethod::class);
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne|\App\Models\CreditCard
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne|\App\Models\PaymentMethod
      */
-    public function activeCreditCard(): HasOne
+    public function activePaymentMethod(): HasOne
     {
-        return $this->hasOne(CreditCard::class)->where('status', CreditCardStatus::ACTIVE);
+        return $this->hasOne(PaymentMethod::class)->where('status', PaymentMethodStatus::ACTIVE);
     }
 
     /**

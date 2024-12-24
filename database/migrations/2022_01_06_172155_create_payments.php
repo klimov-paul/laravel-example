@@ -13,13 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('credit_cards', function (Blueprint $table) {
+        Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('external_id')->nullable();
-            $table->string('owner_email')->nullable();
-            $table->string('brand')->nullable();
-            $table->string('last_four')->nullable();
+            $table->string('customer_id')->nullable();
+            $table->string('paypal_email')->nullable();
+            $table->string('card_brand')->nullable();
+            $table->string('card_last_four')->nullable();
             $table->unsignedSmallInteger('status');
 
             $table->softDeletes();
@@ -36,7 +36,7 @@ return new class extends Migration
 
         Schema::create('payments', function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger('credit_card_id');
+            $table->unsignedBigInteger('payment_method_id');
             $table->unsignedSmallInteger('type');
             $table->unsignedSmallInteger('status');
             $table->unsignedDecimal('amount');
@@ -46,9 +46,9 @@ return new class extends Migration
             $table->index('type');
             $table->index('status');
 
-            $table->foreign('credit_card_id')
+            $table->foreign('payment_method_id')
                 ->references('id')
-                ->on('credit_cards')
+                ->on('payment_methods')
                 ->onUpdate('cascade')
                 ->onDelete('restrict');
         });
@@ -82,5 +82,6 @@ return new class extends Migration
     {
         Schema::dropIfExists('payment_has_subscription');
         Schema::dropIfExists('payments');
+        Schema::dropIfExists('payment_methods');
     }
 };

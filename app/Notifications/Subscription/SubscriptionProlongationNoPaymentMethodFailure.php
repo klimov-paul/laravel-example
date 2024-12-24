@@ -7,11 +7,12 @@ use App\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
 /**
- * SubscriptionProlongationNoCreditCardFailure is sent to the user in case he has no credit card for subscription prolongation.
+ * SubscriptionProlongationNoPaymentMethodFailure is sent to the user in case he has no payment method (credit card)
+ * for subscription prolongation.
  *
  * @see \App\Services\Subscription\SubscriptionProlonger
  */
-class SubscriptionProlongationNoCreditCardFailure extends Notification
+class SubscriptionProlongationNoPaymentMethodFailure extends Notification
 {
     /**
      * @var \App\Models\Subscription user subscription, which has ended.

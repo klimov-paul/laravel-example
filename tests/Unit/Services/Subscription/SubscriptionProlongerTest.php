@@ -6,16 +6,15 @@ use App\Enums\PaymentStatus;
 use App\Enums\SubscriptionStatus;
 use App\Events\Subscription\UserSubscriptionTerminated;
 use App\Models\User;
-use App\Models\CreditCard;
-use App\Models\Payment;
+use App\Models\PaymentMethod;
 use App\Models\SubscriptionPlan;
 use App\Notifications\Subscription\SubscriptionEnded;
 use App\Notifications\Subscription\SubscriptionProlongationCancelled;
-use App\Notifications\Subscription\SubscriptionProlongationNoCreditCardFailure;
+use App\Notifications\Subscription\SubscriptionProlongationNoPaymentMethodFailure;
 use App\Notifications\Subscription\SubscriptionProlongationSucceed;
 use App\Notifications\Subscription\SubscriptionProlongationPaymentFailure;
 use App\Services\Subscription\SubscriptionProlonger;
-use Database\Factories\CreditCardFactory;
+use Database\Factories\PaymentMethodFactory;
 use Database\Factories\PaymentFactory;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
@@ -61,9 +60,9 @@ class SubscriptionProlongerTest extends TestCase
         $this->subscriptionPlan = SubscriptionPlanFactory::new()->create();
     }
 
-    protected function createUserCreditCard(): CreditCard
+    protected function createUserPaymentMethod(): PaymentMethod
     {
-        return (new CreditCard())->createForUser($this->user, $this->validCreditCardToken());
+        return (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
     }
 
     public function testExpiredNotRecurrent()
@@ -96,7 +95,7 @@ class SubscriptionProlongerTest extends TestCase
 
     public function testExpiredRecurrent()
     {
-        $this->createUserCreditCard();
+        $this->createUserPaymentMethod();
 
         $subscription = $this->subscriptionPlan->subscribe($this->user);
 
@@ -128,7 +127,7 @@ class SubscriptionProlongerTest extends TestCase
     /**
      * @depends testExpiredRecurrent
      */
-    public function testNoCreditCard()
+    public function testNoPaymentMethod()
     {
         $subscription = $this->subscriptionPlan->subscribe($this->user);
 
@@ -149,7 +148,7 @@ class SubscriptionProlongerTest extends TestCase
 
         $this->assertEquals(SubscriptionStatus::ARCHIVED, $subscription->status);
 
-        Notification::assertSentTo($this->user, SubscriptionProlongationNoCreditCardFailure::class);
+        Notification::assertSentTo($this->user, SubscriptionProlongationNoPaymentMethodFailure::class);
 
         Event::assertDispatched(UserSubscriptionTerminated::class, function (UserSubscriptionTerminated $e) use ($subscription) {
             return $e->subscription->id === $subscription->id;
@@ -161,7 +160,7 @@ class SubscriptionProlongerTest extends TestCase
      */
     public function testExpiredRecurrentFail()
     {
-        CreditCardFactory::new()->create([
+        PaymentMethodFactory::new()->create([
             'user_id' => $this->user->id,
         ]);
 
@@ -194,7 +193,7 @@ class SubscriptionProlongerTest extends TestCase
 
     public function testActivatePending()
     {
-        $this->createUserCreditCard();
+        $this->createUserPaymentMethod();
 
         $subscription = $this->subscriptionPlan->subscribe($this->user, 1, [
             'status' => SubscriptionStatus::PENDING,
@@ -223,7 +222,7 @@ class SubscriptionProlongerTest extends TestCase
      */
     public function testMaxPaymentAttemptReach()
     {
-        $creditCard = CreditCardFactory::new()->create([
+        $paymentMethod = PaymentMethodFactory::new()->create([
             'user_id' => $this->user->id,
         ]);
 
@@ -233,7 +232,7 @@ class SubscriptionProlongerTest extends TestCase
 
         for ($attemptCount = 1; $attemptCount < SubscriptionProlonger::MAX_PAYMENT_ATTEMPT_COUNT; $attemptCount++) {
             $payment = PaymentFactory::new()->create([
-                'credit_card_id' => $creditCard->id,
+                'payment_method_id' => $paymentMethod->id,
                 'status' => PaymentStatus::FAILED,
             ]);
             $subscription->payments()->attach($payment->id);

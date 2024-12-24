@@ -18,7 +18,7 @@ trait BraintreeTrait
     /**
      * Skips test in case Braintree configuration is incorrect.
      */
-    protected function skipOnBraintreeInvalidConfig()
+    protected function skipOnBraintreeInvalidConfig(): void
     {
         if (config('services.braintree.environment') !== 'sandbox') {
             $this->markTestSkipped("Unable to run test while Braintree is not in 'sandbox' mode.");
@@ -30,12 +30,12 @@ trait BraintreeTrait
     }
 
     /**
-     * Returns valid credit card token (nonce) for testing.
+     * Returns valid payment method (credit card) nonce for testing.
      * @see https://developers.braintreepayments.com/reference/general/testing/php#payment-method-nonces
      *
      * @return string
      */
-    protected function validCreditCardToken()
+    protected function validPaymentMethodNonce(): string
     {
         return 'fake-valid-visa-nonce';
     }
@@ -47,7 +47,7 @@ trait BraintreeTrait
      *
      * @return string
      */
-    public function validCreditCardNumber()
+    public function validCreditCardNumber(): string
     {
         return '378282246310005';
     }

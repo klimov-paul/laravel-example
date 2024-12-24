@@ -30,7 +30,7 @@ class BraintreeTest extends TestCase
 
     public function testCharge()
     {
-        $customerData = $this->paymentGateway->createCustomer($this->validCreditCardToken());
+        $customerData = $this->paymentGateway->createCustomer($this->validPaymentMethodNonce());
 
         $this->assertFalse(empty($customerData['customer_id']));
         $this->assertFalse(empty($customerData['card_brand']));

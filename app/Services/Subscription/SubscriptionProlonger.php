@@ -9,7 +9,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use App\Notifications\Subscription\SubscriptionEnded;
 use App\Notifications\Subscription\SubscriptionProlongationCancelled;
-use App\Notifications\Subscription\SubscriptionProlongationNoCreditCardFailure;
+use App\Notifications\Subscription\SubscriptionProlongationNoPaymentMethodFailure;
 use App\Notifications\Subscription\SubscriptionProlongationPaymentFailure;
 use App\Notifications\Subscription\SubscriptionProlongationSucceed;
 use LogicException;
@@ -53,8 +53,8 @@ class SubscriptionProlonger
             return;
         }
 
-        if ($this->subscription->user->activeCreditCard === null) {
-            $this->notifyNoCreditCard();
+        if ($this->subscription->user->activePaymentMethod === null) {
+            $this->notifyNoPaymentMethod();
 
             $this->dispatchSubscriptionTerminatedEvent();
 
@@ -75,10 +75,10 @@ class SubscriptionProlonger
             throw new LogicException('Subscription to be activated can be only in pending status.');
         }
 
-        if ($this->subscription->user->activeCreditCard()->first() === null) {
+        if ($this->subscription->user->activePaymentMethod()->first() === null) {
             $this->subscription->update(['status' => SubscriptionStatus::CANCELLED]);
 
-            $this->notifyNoCreditCard();
+            $this->notifyNoPaymentMethod();
 
             $this->dispatchSubscriptionTerminatedEvent();
 
@@ -98,7 +98,7 @@ class SubscriptionProlonger
     {
         $payment = $this->subscription
             ->user
-            ->activeCreditCard
+            ->activePaymentMethod
             ->pay(
                 $this->subscription->subscriptionPlan->price,
                 PaymentType::SUBSCRIPTION
@@ -137,7 +137,7 @@ class SubscriptionProlonger
     {
         $payment = $this->subscription
             ->user
-            ->activeCreditCard
+            ->activePaymentMethod
             ->pay($this->subscription->subscriptionPlan->price, PaymentType::SUBSCRIPTION);
 
         $this->subscription->payments()->attach($payment);
@@ -179,24 +179,24 @@ class SubscriptionProlonger
     /**
      * Notifies user about subscription graceful ending.
      */
-    protected function notifyEnded()
+    protected function notifyEnded(): void
     {
         $this->subscription->user->notify(new SubscriptionEnded($this->subscription));
     }
 
     /**
-     * Notifies user about subscription processing failure due to credit card absence.
+     * Notifies user about subscription processing failure due to payment method (credit card) absence.
      */
-    protected function notifyNoCreditCard()
+    protected function notifyNoPaymentMethod(): void
     {
-        $this->subscription->user->notify(new SubscriptionProlongationNoCreditCardFailure($this->subscription));
+        $this->subscription->user->notify(new SubscriptionProlongationNoPaymentMethodFailure($this->subscription));
     }
 
     /**
      * Notifies user about successful subscription prolongation.
      * @param \App\Models\Subscription $newSubscription new user subscription.
      */
-    protected function notifyProlongationSuccess(Subscription $newSubscription)
+    protected function notifyProlongationSuccess(Subscription $newSubscription): void
     {
         $newSubscription->user->notify(new SubscriptionProlongationSucceed($newSubscription));
     }
@@ -205,7 +205,7 @@ class SubscriptionProlonger
      * Notifies user about failed subscription prolongation attempt, e.g. another attempt will be made.
      * @param \App\Models\Payment $payment failed payment instance.
      */
-    protected function notifyProlongationFailure(Payment $payment)
+    protected function notifyProlongationFailure(Payment $payment): void
     {
         $this->subscription->user->notify(new SubscriptionProlongationPaymentFailure($this->subscription, $payment));
     }
@@ -214,7 +214,7 @@ class SubscriptionProlonger
      * Notifies user about subscription prolongation cancel, e.g. no more prolongation attempts
      * will be performed.
      */
-    protected function notifyProlongationCancel()
+    protected function notifyProlongationCancel(): void
     {
         $this->subscription->user->notify(new SubscriptionProlongationCancelled($this->subscription));
     }

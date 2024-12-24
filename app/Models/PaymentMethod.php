@@ -7,22 +7,23 @@ use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Facades\App;
 use App\Enums\PaymentType;
+use App\Enums\PaymentMethodStatus;
 use App\Enums\PaymentStatus;
-use App\Enums\CreditCardStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- * CreditCard represents particular user's credit card linked via external payment gateway.
+ * PaymentMethod represents particular user's persistent payment method e.g. "credit card", "PayPal account" etc.
+ * linked via external payment gateway.
  *
  * @property int $id
  * @property int $user_id
  * @property int $status
- * @property string $external_id
- * @property string $owner_email
- * @property string $brand
- * @property string $last_four
+ * @property string $customer_id
+ * @property string $paypal_email
+ * @property string $card_brand
+ * @property string $card_last_four
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -32,7 +33,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  *
  * @method static \Illuminate\Database\Eloquent\Builder|static query()
  */
-class CreditCard extends Model
+class PaymentMethod extends Model
 {
     use SoftDeletes;
 
@@ -65,26 +66,26 @@ class CreditCard extends Model
 
     public function deactivate(): bool
     {
-        return $this->update(['status' => CreditCardStatus::INACTIVE]);
+        return $this->update(['status' => PaymentMethodStatus::INACTIVE]);
     }
 
-    public function createForUser(User $user, string $creditCardToken): self
+    public function createForUser(User $user, string $paymentMethodNonce): self
     {
         if ($this->exists) {
             throw new \LogicException('Unable to save already existing credit card.');
         }
 
-        $this->status = CreditCardStatus::ACTIVE;
+        $this->status = PaymentMethodStatus::ACTIVE;
 
         $this->user()->associate($user);
 
-        $this->createAsPaymentGatewayCustomer($creditCardToken);
+        $this->createAsPaymentGatewayCustomer($paymentMethodNonce);
 
         static::query()
             ->where('user_id', $user->id)
             ->whereKeyNot($this->id)
-            ->where('status', CreditCardStatus::ACTIVE)
-            ->update(['status' => CreditCardStatus::INACTIVE]);
+            ->where('status', PaymentMethodStatus::ACTIVE)
+            ->update(['status' => PaymentMethodStatus::INACTIVE]);
 
         $user->unsetRelation('activeCreditCard');
 
@@ -152,10 +153,10 @@ class CreditCard extends Model
             'email' => $this->user->email,
         ]);
 
-        $this->external_id = $customerData['customer_id'];
-        $this->owner_email = $customerData['paypal_email'];
-        $this->brand = $customerData['card_brand'];
-        $this->last_four = $customerData['card_last_four'];
+        $this->customer_id = $customerData['customer_id'];
+        $this->paypal_email = $customerData['paypal_email'];
+        $this->card_brand = $customerData['card_brand'];
+        $this->card_last_four = $customerData['card_last_four'];
         $this->save();
 
         return $this;
@@ -163,7 +164,7 @@ class CreditCard extends Model
 
     protected function charge($amount, array $options): array
     {
-        return $this->paymentGateway()->charge($this->external_id, $amount, $options);
+        return $this->paymentGateway()->charge($this->customer_id, $amount, $options);
     }
 
     protected function paymentGateway(): Braintree

@@ -4,7 +4,7 @@ namespace Tests\Unit\Services\Subscription;
 
 use App\Events\Subscription\UserSubscribed;
 use App\Exceptions\PaymentException;
-use App\Models\CreditCard;
+use App\Models\PaymentMethod;
 use App\Models\User;
 use App\Models\SubscriptionPlan;
 use App\Services\Subscription\SubscriptionCheckout;
@@ -55,20 +55,20 @@ class SubscriptionCheckoutTest extends TestCase
     {
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
 
-        $subscription = $checkout->process($this->validCreditCardToken());
+        $subscription = $checkout->process($this->validPaymentMethodNonce());
 
         $this->assertEquals($this->user->id, $subscription->user_id);
         $this->assertEquals($this->subscriptionPlan->id, $subscription->subscription_plan_id);
-        $this->assertNotNull($this->user->activeCreditCard);
+        $this->assertNotNull($this->user->activePaymentMethod);
 
-        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activeCreditCard->external_id]);
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->customer_id]);
 
         Event::assertDispatched(UserSubscribed::class, function (UserSubscribed $e) use ($subscription) {
             return $e->subscription->id === $subscription->id;
         });
     }
 
-    public function testProcessNoCreditCard()
+    public function testProcessNoPaymentMethod()
     {
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
 
@@ -80,9 +80,9 @@ class SubscriptionCheckoutTest extends TestCase
     /**
      * @depends testProcessSuccess
      */
-    public function testProcessExistingCreditCard()
+    public function testProcessExistingPaymentMethod()
     {
-        (new CreditCard())->createForUser($this->user, $this->validCreditCardToken());
+        (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
 
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
 
@@ -90,15 +90,15 @@ class SubscriptionCheckoutTest extends TestCase
 
         $this->assertEquals($this->user->id, $subscription->user_id);
 
-        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activeCreditCard->external_id]);
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->customer_id]);
     }
 
     /**
-     * @depends testProcessExistingCreditCard
+     * @depends testProcessExistingPaymentMethod
      */
     public function testUpgradeSubscription()
     {
-        (new CreditCard())->createForUser($this->user, $this->validCreditCardToken());
+        (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
 
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
         $checkout->process();
@@ -116,11 +116,11 @@ class SubscriptionCheckoutTest extends TestCase
     }
 
     /**
-     * @depends testProcessExistingCreditCard
+     * @depends testProcessExistingPaymentMethod
      */
     public function testDowngradeSubscription()
     {
-        (new CreditCard())->createForUser($this->user, $this->validCreditCardToken());
+        (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
 
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
         $checkout->process();

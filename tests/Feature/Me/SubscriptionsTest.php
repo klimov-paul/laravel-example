@@ -41,7 +41,7 @@ class SubscriptionsTest extends TestCase
 
         $this->postJson(route('api.me.subscriptions.store'), [
             'subscription_plan_id' => $this->subscriptionPlan->id,
-            'token' => 'fake-valid-visa-nonce',
+            'nonce' => 'fake-valid-visa-nonce',
             'accept_terms' => true,
         ])
             ->assertSuccessful()
@@ -127,7 +127,7 @@ class SubscriptionsTest extends TestCase
     /**
      * @depends testSubscribe
      */
-    public function testSubscribeErrorNoCreditCard()
+    public function testSubscribeErrorNoPaymentMethod()
     {
         $this->actingAs($this->user);
 
