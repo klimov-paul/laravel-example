@@ -209,7 +209,7 @@ class PaymentMethod extends Model
 
     protected function charge($amount, array $options): array
     {
-        return $this->paymentGateway()->charge($this->token, $amount, $options);
+        return $this->paymentGateway()->sale($this->token, $amount, $options);
     }
 
     protected function paymentGateway(): Braintree

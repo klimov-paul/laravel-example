@@ -51,6 +51,8 @@ class Braintree
     /**
      * Create a Braintree customer with payment method from nonce received from client-side SDK.
      *
+     * @see https://developer.paypal.com/braintree/docs/reference/request/customer/create/php
+     *
      * @param string $paymentMethodNonce nonce received from client-side SDK.
      * @param array $options
      * @return array created payment method data.
@@ -128,13 +130,13 @@ class Braintree
      *
      * @see https://developer.paypal.com/braintree/docs/reference/request/transaction/sale/php
      *
-     * @param int $customerId
-     * @param int|float $amount
+     * @param string $paymentMethodToken
+     * @param int|float $amount amount in major units.
      * @param array $options
      * @return array transaction data.
      * @throws \RuntimeException
      */
-    public function charge(string $paymentMethodToken, int|float $amount, array $options = []): array
+    public function sale(string $paymentMethodToken, int|float $amount, array $options = []): array
     {
         $paymentMethod = $this->gateway->paymentMethod()->find($paymentMethodToken);
 
@@ -147,7 +149,7 @@ class Braintree
         ], $options));
 
         if (!$response->success) {
-            throw new \RuntimeException('Braintree was unable to perform a charge: ' . $response->message);
+            throw new \RuntimeException('Braintree was unable to perform a sale: ' . $response->message);
         }
 
         return $response->transaction->jsonSerialize();

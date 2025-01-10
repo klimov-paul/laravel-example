@@ -7,7 +7,7 @@ use App\Services\Payment\Braintree;
 class BraintreeMock extends Braintree
 {
     /**
-     * @var array mock balance sums in format: `[customerId => balanceSum]`
+     * @var array mock balance sums in format: `[paymentMethodToken => balanceSum]`
      */
     public array $balances = [];
 
@@ -62,7 +62,7 @@ class BraintreeMock extends Braintree
     /**
      * {@inheritdoc}
      */
-    public function charge(string $paymentMethodToken, int|float $amount, array $options = []): array
+    public function sale(string $paymentMethodToken, int|float $amount, array $options = []): array
     {
         $this->balances[$paymentMethodToken] -= $amount;
 

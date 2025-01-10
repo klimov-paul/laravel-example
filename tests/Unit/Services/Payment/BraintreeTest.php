@@ -37,7 +37,7 @@ class BraintreeTest extends TestCase
         $this->assertFalse(empty($paymentMethod['card_brand']));
         $this->assertFalse(empty($paymentMethod['card_last_four']));
 
-        $result = $this->paymentGateway->charge($paymentMethod['token'], 100);
+        $result = $this->paymentGateway->sale($paymentMethod['token'], 100);
 
         $this->assertFalse(empty($result['id']));
 
@@ -47,7 +47,7 @@ class BraintreeTest extends TestCase
         $this->assertFalse(empty($anotherPaymentMethod['card_brand']));
         $this->assertFalse(empty($anotherPaymentMethod['card_last_four']));
 
-        $result = $this->paymentGateway->charge($anotherPaymentMethod['token'], 200);
+        $result = $this->paymentGateway->sale($anotherPaymentMethod['token'], 200);
 
         $this->assertFalse(empty($result['id']));
     }
