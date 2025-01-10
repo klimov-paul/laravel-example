@@ -61,7 +61,7 @@ class SubscriptionCheckoutTest extends TestCase
         $this->assertEquals($this->subscriptionPlan->id, $subscription->subscription_plan_id);
         $this->assertNotNull($this->user->activePaymentMethod);
 
-        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->customer_id]);
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->token]);
 
         Event::assertDispatched(UserSubscribed::class, function (UserSubscribed $e) use ($subscription) {
             return $e->subscription->id === $subscription->id;
@@ -90,7 +90,7 @@ class SubscriptionCheckoutTest extends TestCase
 
         $this->assertEquals($this->user->id, $subscription->user_id);
 
-        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->customer_id]);
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->token]);
     }
 
     /**

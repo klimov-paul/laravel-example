@@ -21,9 +21,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id
  * @property int $status
  * @property string $customer_id
- * @property string $paypal_email
- * @property string $card_brand
- * @property string $card_last_four
+ * @property string $token
+ * @property string|null $paypal_email
+ * @property string|null $card_brand
+ * @property string|null $card_last_four
+ * @property int|null $card_expiration_month
+ * @property int|null $card_expiration_year
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
  * @property \Illuminate\Support\Carbon|null $deleted_at
@@ -42,9 +45,11 @@ class PaymentMethod extends Model
      */
     protected $fillable = [
         'external_id',
-        'owner_email',
-        'brand',
-        'last_four',
+        'paypal_email',
+        'card_brand',
+        'card_last_four',
+        'card_expiration_month',
+        'card_expiration_year',
         'status',
     ];
 
@@ -69,6 +74,25 @@ class PaymentMethod extends Model
         return $this->update(['status' => PaymentMethodStatus::INACTIVE]);
     }
 
+    /**
+     * @param int $userId user ID.
+     * @return string|null Braintree customer ID, `null` if not exist.
+     */
+    public static function findLatestCustomerId(int $userId): ?string
+    {
+        $previousPaymentMethod = static::query()
+            ->where('user_id', $userId)
+            ->orderBy('id', 'desc')
+            ->take(1)
+            ->first();
+
+        if (empty($previousPaymentMethod)) {
+            return null;
+        }
+
+        return $previousPaymentMethod->customer_id;
+    }
+
     public function createForUser(User $user, string $paymentMethodNonce): self
     {
         if ($this->exists) {
@@ -79,7 +103,13 @@ class PaymentMethod extends Model
 
         $this->user()->associate($user);
 
-        $this->createAsPaymentGatewayCustomer($paymentMethodNonce);
+        $customerId = static::findLatestCustomerId($user->id);
+
+        if (empty($customerId)) {
+            $this->createAsPaymentGatewayCustomer($paymentMethodNonce);
+        } else {
+            $this->createAsPaymentGatewayMethod($customerId, $paymentMethodNonce);
+        }
 
         static::query()
             ->where('user_id', $user->id)
@@ -88,6 +118,40 @@ class PaymentMethod extends Model
             ->update(['status' => PaymentMethodStatus::INACTIVE]);
 
         $user->unsetRelation('activeCreditCard');
+
+        return $this;
+    }
+
+    protected function createAsPaymentGatewayCustomer(string $paymentMethodNonce): self
+    {
+        $nameParts = explode(' ', $this->user->name);
+
+        $paymentMethod = $this->paymentGateway()->createCustomerWithPaymentMethod($paymentMethodNonce, [
+            'firstName' => $nameParts[0] ?? null,
+            'lastName' => $nameParts[1] ?? null,
+            'email' => $this->user->email,
+        ]);
+
+        return $this->createFromPaymentMethodData($paymentMethod);
+    }
+
+    protected function createAsPaymentGatewayMethod(string $customerId, string $paymentMethodNonce): self
+    {
+        $paymentMethod = $this->paymentGateway()->createPaymentMethod($customerId, $paymentMethodNonce);
+
+        return $this->createFromPaymentMethodData($paymentMethod);
+    }
+
+    protected function createFromPaymentMethodData(array $paymentMethodData): self
+    {
+        $this->customer_id = $paymentMethodData['customer_id'];
+        $this->token = $paymentMethodData['token'];
+        $this->paypal_email = $paymentMethodData['paypal_email'];
+        $this->card_brand = $paymentMethodData['card_brand'];
+        $this->card_last_four = $paymentMethodData['card_last_four'];
+        $this->card_expiration_month = $paymentMethodData['card_expiration_month'];
+        $this->card_expiration_year = $paymentMethodData['card_expiration_year'];
+        $this->save();
 
         return $this;
     }
@@ -143,28 +207,9 @@ class PaymentMethod extends Model
         ], $attributes));
     }
 
-    protected function createAsPaymentGatewayCustomer(string $paymentMethodNonce): self
-    {
-        $nameParts = explode(' ', $this->user->name);
-
-        $customerData = $this->paymentGateway()->createCustomer($paymentMethodNonce, [
-            'firstName' => $nameParts[0] ?? null,
-            'lastName' => $nameParts[1] ?? null,
-            'email' => $this->user->email,
-        ]);
-
-        $this->customer_id = $customerData['customer_id'];
-        $this->paypal_email = $customerData['paypal_email'];
-        $this->card_brand = $customerData['card_brand'];
-        $this->card_last_four = $customerData['card_last_four'];
-        $this->save();
-
-        return $this;
-    }
-
     protected function charge($amount, array $options): array
     {
-        return $this->paymentGateway()->charge($this->customer_id, $amount, $options);
+        return $this->paymentGateway()->charge($this->token, $amount, $options);
     }
 
     protected function paymentGateway(): Braintree

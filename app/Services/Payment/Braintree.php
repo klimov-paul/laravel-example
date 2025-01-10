@@ -4,7 +4,6 @@ namespace App\Services\Payment;
 
 use Braintree\Gateway;
 use Braintree\PayPalAccount;
-use Braintree\Result\Successful;
 
 /**
  * Braintree provides abstraction for "PayPal Braintree" payment gateway interaction.
@@ -50,14 +49,14 @@ class Braintree
     }
 
     /**
-     * Create a Braintree customer for the given attributes.
+     * Create a Braintree customer with payment method from nonce received from client-side SDK.
      *
-     * @param string $paymentMethodNonce
+     * @param string $paymentMethodNonce nonce received from client-side SDK.
      * @param array $options
-     * @return array created customer data.
+     * @return array created payment method data.
      * @throws \RuntimeException
      */
-    public function createCustomer(string $paymentMethodNonce, array $options = []): array
+    public function createCustomerWithPaymentMethod(string $paymentMethodNonce, array $options = []): array
     {
         $response = $this->gateway->customer()->create(
             array_replace_recursive([
@@ -73,19 +72,54 @@ class Braintree
             ], $options)
         );
 
-        if (! $response->success) {
+        if (!$response->success) {
             throw new \RuntimeException('Unable to create Braintree customer: ' . $response->message);
         }
 
-        $paymentMethod = $response->customer->defaultPaymentMethod();
+        return $this->formatPaymentMethod($response->customer->defaultPaymentMethod());
+    }
 
+    /**
+     * Creates new payment method for existing customer.
+     *
+     * @see https://developer.paypal.com/braintree/docs/reference/request/payment-method/create/php
+     *
+     * @param string $customerId Braintree customer ID.
+     * @param string $paymentMethodNonce nonce received from client-side SDK.
+     * @param array $options
+     * @return array created payment method data.
+     */
+    public function createPaymentMethod(string $customerId, string $paymentMethodNonce, array $options = []): array
+    {
+        $response = $this->gateway->paymentMethod()->create(
+            array_replace_recursive([
+                'customerId' => $customerId,
+                'paymentMethodNonce' => $paymentMethodNonce,
+                'options' => [
+                    'verifyCard' => true,
+                ],
+            ], $options)
+        );
+
+        if (!$response->success) {
+            throw new \RuntimeException('Unable to create Braintree payment method: ' . $response->message);
+        }
+
+        return $this->formatPaymentMethod($response->paymentMethod);
+    }
+
+    protected function formatPaymentMethod(object $paymentMethod): array
+    {
         $isPaypalAccount = $paymentMethod instanceof PaypalAccount;
 
         return [
-            'customer_id' => $response->customer->id,
+            'customer_id' => $paymentMethod->customerId,
+            'token' => $paymentMethod->token,
             'paypal_email' => $isPaypalAccount ? $paymentMethod->email : null,
             'card_brand' => $isPaypalAccount ? null : $paymentMethod->cardType,
             'card_last_four' => $isPaypalAccount ? null : $paymentMethod->last4,
+            'card_expiration_month' => $isPaypalAccount ? null : $paymentMethod->expirationMonth,
+            'card_expiration_year' => $isPaypalAccount ? null : $paymentMethod->expirationYear,
         ];
     }
 
@@ -95,14 +129,14 @@ class Braintree
      * @see https://developer.paypal.com/braintree/docs/reference/request/transaction/sale/php
      *
      * @param int $customerId
-     * @param int $amount
+     * @param int|float $amount
      * @param array $options
      * @return array transaction data.
      * @throws \RuntimeException
      */
-    public function charge($customerId, $amount, array $options = []): array
+    public function charge(string $paymentMethodToken, int|float $amount, array $options = []): array
     {
-        $paymentMethod = $this->gateway->customer()->find($customerId)->defaultPaymentMethod();
+        $paymentMethod = $this->gateway->paymentMethod()->find($paymentMethodToken);
 
         $response = $this->gateway->transaction()->sale(array_merge([
             'amount' => number_format($amount, 2, '.', ''),
@@ -112,7 +146,7 @@ class Braintree
             ],
         ], $options));
 
-        if (! $response->success) {
+        if (!$response->success) {
             throw new \RuntimeException('Braintree was unable to perform a charge: ' . $response->message);
         }
 

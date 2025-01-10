@@ -28,15 +28,26 @@ class BraintreeTest extends TestCase
         $this->paymentGateway = $this->app->make(Braintree::class);
     }
 
-    public function testCharge()
+    public function testCharge(): void
     {
-        $customerData = $this->paymentGateway->createCustomer($this->validPaymentMethodNonce());
+        $paymentMethod = $this->paymentGateway->createCustomerWithPaymentMethod($this->validPaymentMethodNonce());
 
-        $this->assertFalse(empty($customerData['customer_id']));
-        $this->assertFalse(empty($customerData['card_brand']));
-        $this->assertFalse(empty($customerData['card_last_four']));
+        $this->assertFalse(empty($paymentMethod['customer_id']));
+        $this->assertFalse(empty($paymentMethod['token']));
+        $this->assertFalse(empty($paymentMethod['card_brand']));
+        $this->assertFalse(empty($paymentMethod['card_last_four']));
 
-        $result = $this->paymentGateway->charge($customerData['customer_id'], 100);
+        $result = $this->paymentGateway->charge($paymentMethod['token'], 100);
+
+        $this->assertFalse(empty($result['id']));
+
+        $anotherPaymentMethod = $this->paymentGateway->createPaymentMethod($paymentMethod['customer_id'], $this->validPaymentMethodNonce());
+        $this->assertFalse(empty($anotherPaymentMethod['customer_id']));
+        $this->assertFalse(empty($anotherPaymentMethod['token']));
+        $this->assertFalse(empty($anotherPaymentMethod['card_brand']));
+        $this->assertFalse(empty($anotherPaymentMethod['card_last_four']));
+
+        $result = $this->paymentGateway->charge($anotherPaymentMethod['token'], 200);
 
         $this->assertFalse(empty($result['id']));
     }

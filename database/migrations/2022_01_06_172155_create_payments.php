@@ -16,10 +16,13 @@ return new class extends Migration
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('user_id');
-            $table->string('customer_id')->nullable();
+            $table->string('customer_id');
+            $table->string('token');
             $table->string('paypal_email')->nullable();
             $table->string('card_brand')->nullable();
             $table->string('card_last_four')->nullable();
+            $table->unsignedTinyInteger('card_expiration_month')->nullable();
+            $table->unsignedSmallInteger('card_expiration_year')->nullable();
             $table->unsignedSmallInteger('status');
 
             $table->softDeletes();
