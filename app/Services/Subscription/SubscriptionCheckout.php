@@ -45,7 +45,7 @@ class SubscriptionCheckout
 
         try {
             if ($paymentMethodNonce) {
-                (new PaymentMethod())->createForUser($this->user, $paymentMethodNonce);
+                PaymentMethod::createForUser($this->user, $paymentMethodNonce);
             }
 
             $isNewSubscription = ($this->user->activeSubscription === null);

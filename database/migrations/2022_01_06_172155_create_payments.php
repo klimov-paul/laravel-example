@@ -35,6 +35,7 @@ return new class extends Migration
                 ->onDelete('restrict');
 
             $table->index('status');
+            $table->index('token');
         });
 
         Schema::create('payments', function (Blueprint $table) {

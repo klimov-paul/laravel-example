@@ -82,7 +82,7 @@ class SubscriptionCheckoutTest extends TestCase
      */
     public function testProcessExistingPaymentMethod()
     {
-        (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
+        PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
 
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
 
@@ -98,7 +98,7 @@ class SubscriptionCheckoutTest extends TestCase
      */
     public function testUpgradeSubscription()
     {
-        (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
+        PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
 
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
         $checkout->process();
@@ -120,7 +120,7 @@ class SubscriptionCheckoutTest extends TestCase
      */
     public function testDowngradeSubscription()
     {
-        (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
+        PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
 
         $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
         $checkout->process();

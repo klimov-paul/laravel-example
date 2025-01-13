@@ -93,33 +93,36 @@ class PaymentMethod extends Model
         return $previousPaymentMethod->customer_id;
     }
 
-    public function createForUser(User $user, string $paymentMethodNonce): self
+    /**
+     * @param \app\models\User $user user to bind new payment method to.
+     * @param string $paymentMethodNonce payment method nonce received from client side SDK.
+     * @return static new model instance.
+     */
+    public static function createForUser(User $user, string $paymentMethodNonce): self
     {
-        if ($this->exists) {
-            throw new \LogicException('Unable to save already existing credit card.');
-        }
+        $model = new static();
 
-        $this->status = PaymentMethodStatus::ACTIVE;
+        $model->status = PaymentMethodStatus::ACTIVE;
 
-        $this->user()->associate($user);
+        $model->user()->associate($user);
 
         $customerId = static::findLatestCustomerId($user->id);
 
         if (empty($customerId)) {
-            $this->createAsPaymentGatewayCustomer($paymentMethodNonce);
+            $model = $model->createAsPaymentGatewayCustomer($paymentMethodNonce);
         } else {
-            $this->createAsPaymentGatewayMethod($customerId, $paymentMethodNonce);
+            $model = $model->createAsPaymentGatewayMethod($customerId, $paymentMethodNonce);
         }
 
         static::query()
             ->where('user_id', $user->id)
-            ->whereKeyNot($this->id)
+            ->whereKeyNot($model->id)
             ->where('status', PaymentMethodStatus::ACTIVE)
             ->update(['status' => PaymentMethodStatus::INACTIVE]);
 
         $user->unsetRelation('activeCreditCard');
 
-        return $this;
+        return $model;
     }
 
     protected function createAsPaymentGatewayCustomer(string $paymentMethodNonce): self
@@ -138,6 +141,23 @@ class PaymentMethod extends Model
     protected function createAsPaymentGatewayMethod(string $customerId, string $paymentMethodNonce): self
     {
         $paymentMethod = $this->paymentGateway()->createPaymentMethod($customerId, $paymentMethodNonce);
+
+        $alreadyExistingModel = static::query()
+            ->where([
+                'user_id' => $this->user_id,
+                'customer_id' => $customerId,
+                'token' => $paymentMethod['token'],
+            ])
+            ->first();
+
+        if (!empty($alreadyExistingModel)) {
+            if ($alreadyExistingModel->status != PaymentMethodStatus::ACTIVE) {
+                $alreadyExistingModel->status = PaymentMethodStatus::ACTIVE;
+                $alreadyExistingModel->save();
+            }
+
+            return $alreadyExistingModel;
+        }
 
         return $this->createFromPaymentMethodData($paymentMethod);
     }

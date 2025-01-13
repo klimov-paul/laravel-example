@@ -62,7 +62,7 @@ class SubscriptionProlongerTest extends TestCase
 
     protected function createUserPaymentMethod(): PaymentMethod
     {
-        return (new PaymentMethod())->createForUser($this->user, $this->validPaymentMethodNonce());
+        return PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
     }
 
     public function testExpiredNotRecurrent()
