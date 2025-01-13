@@ -6,6 +6,7 @@ use Database\Factories\UserFactory;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Password;
+use PHPUnit\Framework\Attributes\Depends;
 use Tests\TestCase;
 
 /**
@@ -79,9 +80,7 @@ class ForgotPasswordTest extends TestCase
             ->assertSuccessful();
     }
 
-    /**
-     * @depends testSendResetLink
-     */
+    #[Depends('testSendResetLink')]
     public function testResetPassword(): void
     {
         $token = $this->passwordBroker->createToken($this->user);
@@ -123,9 +122,7 @@ class ForgotPasswordTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    /**
-     * @depends testSendResetLink
-     */
+    #[Depends('testSendResetLink')]
     public function testResetPasswordFail(): void
     {
         $newPassword = 'new-password-2';

@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Enums\AdminRoleEnum;
 use App\Models\Admin;
 use Database\Factories\AdminFactory;
+use PHPUnit\Framework\Attributes\Depends;
 use Tests\TestCase;
 
 /**
@@ -34,9 +35,7 @@ class AdminsTest extends TestCase
             ->assertSuccessful();
     }
 
-    /**
-     * @depends testIndex
-     */
+    #[Depends('testIndex')]
     public function testPermissions(): void
     {
         $this->admin->update(['role' => AdminRoleEnum::CONTENT_MANAGER]);

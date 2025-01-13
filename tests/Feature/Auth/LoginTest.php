@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Enums\UserStatus;
 use Database\Factories\UserFactory;
+use PHPUnit\Framework\Attributes\Depends;
 use Tests\TestCase;
 
 /**
@@ -102,9 +103,7 @@ class LoginTest extends TestCase
         $this->assertGuest();
     }
 
-    /**
-     * @depends testLogin
-     */
+    #[Depends('testLogin')]
     public function testLoginInactiveAccount(): void
     {
         $this->user->update(['status' => UserStatus::BANNED]);

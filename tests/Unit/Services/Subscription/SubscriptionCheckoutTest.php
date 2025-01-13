@@ -11,14 +11,14 @@ use App\Services\Subscription\SubscriptionCheckout;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
 use Illuminate\Support\Facades\Event;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Support\Payment\BraintreeMock;
 use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
-/**
- * @group subscription
- * @group braintree
- */
+#[Group('subscription')]
+#[Group('braintree')]
 class SubscriptionCheckoutTest extends TestCase
 {
     use BraintreeTrait;
@@ -77,9 +77,7 @@ class SubscriptionCheckoutTest extends TestCase
         $checkout->process();
     }
 
-    /**
-     * @depends testProcessSuccess
-     */
+    #[Depends('testProcessSuccess')]
     public function testProcessExistingPaymentMethod(): void
     {
         PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
@@ -93,9 +91,7 @@ class SubscriptionCheckoutTest extends TestCase
         $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->token]);
     }
 
-    /**
-     * @depends testProcessExistingPaymentMethod
-     */
+    #[Depends('testProcessExistingPaymentMethod')]
     public function testUpgradeSubscription(): void
     {
         PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
@@ -115,9 +111,7 @@ class SubscriptionCheckoutTest extends TestCase
         Event::assertDispatchedTimes(UserSubscribed::class, 1);
     }
 
-    /**
-     * @depends testProcessExistingPaymentMethod
-     */
+    #[Depends('testProcessExistingPaymentMethod')]
     public function testDowngradeSubscription(): void
     {
         PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());

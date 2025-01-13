@@ -6,13 +6,13 @@ use App\Models\User;
 use App\Models\SubscriptionPlan;
 use Database\Factories\SubscriptionPlanFactory;
 use Database\Factories\UserFactory;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
-/**
- * @group subscription
- * @group braintree
- */
+#[Group('subscription')]
+#[Group('braintree')]
 class SubscriptionsTest extends TestCase
 {
     use BraintreeTrait;
@@ -71,9 +71,7 @@ class SubscriptionsTest extends TestCase
         $this->assertNotNull($this->user->activeSubscription);
     }
 
-    /**
-     * @depends testSubscribe
-     */
+    #[Depends('testSubscribe')]
     public function testHistory(): void
     {
         $this->actingAs($this->user);
@@ -96,9 +94,7 @@ class SubscriptionsTest extends TestCase
             ]);
     }
 
-    /**
-     * @depends testSubscribe
-     */
+    #[Depends('testSubscribe')]
     public function testShow(): void
     {
         $this->actingAs($this->user);
@@ -124,9 +120,7 @@ class SubscriptionsTest extends TestCase
             ]);
     }
 
-    /**
-     * @depends testSubscribe
-     */
+    #[Depends('testSubscribe')]
     public function testSubscribeErrorNoPaymentMethod(): void
     {
         $this->actingAs($this->user);

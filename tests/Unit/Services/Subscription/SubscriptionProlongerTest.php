@@ -21,13 +21,13 @@ use Database\Factories\UserFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
+use PHPUnit\Framework\Attributes\Depends;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
-/**
- * @group subscription
- * @group braintree
- */
+#[Group('subscription')]
+#[Group('braintree')]
 class SubscriptionProlongerTest extends TestCase
 {
     use BraintreeTrait;
@@ -124,9 +124,7 @@ class SubscriptionProlongerTest extends TestCase
         Event::assertNotDispatched(UserSubscriptionTerminated::class);
     }
 
-    /**
-     * @depends testExpiredRecurrent
-     */
+    #[Depends('testExpiredRecurrent')]
     public function testNoPaymentMethod(): void
     {
         $subscription = $this->subscriptionPlan->subscribe($this->user);
@@ -155,9 +153,7 @@ class SubscriptionProlongerTest extends TestCase
         });
     }
 
-    /**
-     * @depends testExpiredRecurrent
-     */
+    #[Depends('testExpiredRecurrent')]
     public function testExpiredRecurrentFail(): void
     {
         PaymentMethodFactory::new()->create([
@@ -217,9 +213,7 @@ class SubscriptionProlongerTest extends TestCase
         Event::assertNotDispatched(UserSubscriptionTerminated::class);
     }
 
-    /**
-     * @depends testActivatePending
-     */
+    #[Depends('testExpiredRecurrent')]
     public function testMaxPaymentAttemptReach(): void
     {
         $paymentMethod = PaymentMethodFactory::new()->create([

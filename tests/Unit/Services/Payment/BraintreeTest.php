@@ -3,13 +3,12 @@
 namespace Tests\Unit\Services\Payment;
 
 use App\Services\Payment\Braintree;
+use PHPUnit\Framework\Attributes\Group;
 use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
-/**
- * @group external-service
- * @group braintree
- */
+#[Group('external-service')]
+#[Group('braintree')]
 class BraintreeTest extends TestCase
 {
     use BraintreeTrait;
