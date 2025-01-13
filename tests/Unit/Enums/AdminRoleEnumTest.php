@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 class AdminRoleEnumTest extends TestCase
 {
-    public function testFindByPermission()
+    public function testFindByPermission(): void
     {
         $roles = AdminRoleEnum::findByPermission(AdminPermissionEnum::CATEGORIES);
         foreach ($roles as $role) {

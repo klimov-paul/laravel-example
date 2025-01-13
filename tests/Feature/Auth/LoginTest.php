@@ -27,7 +27,7 @@ class LoginTest extends TestCase
         $this->user = UserFactory::new()->create();
     }
 
-    public function testShowLoginForm()
+    public function testShowLoginForm(): void
     {
         $response = $this->get(route('auth.login'))
             ->assertSuccessful();
@@ -39,7 +39,7 @@ class LoginTest extends TestCase
         $this->assertMatchesRegularExpression('#<body.*>.+</body>#is', $content);*/
     }
 
-    public function testLogin()
+    public function testLogin(): void
     {
         $this->postJson(route('api.auth.login'), [
             'email' => $this->user->email,
@@ -69,7 +69,7 @@ class LoginTest extends TestCase
         $this->assertAuthenticated();
     }
 
-    public function testLoginFail()
+    public function testLoginFail(): void
     {
         $this->postJson(route('api.auth.login'), [
             'email' => 'unexisting-user@unexisting.email',
@@ -90,7 +90,7 @@ class LoginTest extends TestCase
             ]);
     }
 
-    public function testLogout()
+    public function testLogout(): void
     {
         $this->actingAs($this->user)
             ->postJson(route('api.auth.logout'))
@@ -105,7 +105,7 @@ class LoginTest extends TestCase
     /**
      * @depends testLogin
      */
-    public function testLoginInactiveAccount()
+    public function testLoginInactiveAccount(): void
     {
         $this->user->update(['status' => UserStatus::BANNED]);
 

@@ -10,7 +10,7 @@ use Tests\TestCase;
 
 class AdminTest extends TestCase
 {
-    public function testHasPermission()
+    public function testHasPermission(): void
     {
         $admin = AdminFactory::new()->create([
             'role' => AdminRoleEnum::MASTER_ADMIN,

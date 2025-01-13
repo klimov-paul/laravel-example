@@ -28,7 +28,7 @@ class AllowBookRentRuleTest extends TestCase
         $this->book = BookFactory::new()->create();
     }
 
-    public function testBookDoesNotExist()
+    public function testBookDoesNotExist(): void
     {
         $rule = new AllowBookRentRule($this->user);
 
@@ -37,14 +37,14 @@ class AllowBookRentRuleTest extends TestCase
         $this->assertFalse($rule->passes('book', $this->book->id));
     }
 
-    public function testNoSubscription()
+    public function testNoSubscription(): void
     {
         $rule = new AllowBookRentRule($this->user);
 
         $this->assertFalse($rule->passes('book', $this->book->id));
     }
 
-    public function testDisallowedBySubscriptionPlan()
+    public function testDisallowedBySubscriptionPlan(): void
     {
         $subscriptionPlan = SubscriptionPlanFactory::new()->create([
             'max_book_price' => $this->book->price - 1,
@@ -57,7 +57,7 @@ class AllowBookRentRuleTest extends TestCase
         $this->assertFalse($rule->passes('book', $this->book->id));
     }
 
-    public function testNoAvailableRentSlots()
+    public function testNoAvailableRentSlots(): void
     {
         $subscriptionPlan = SubscriptionPlanFactory::new()->create([
             'max_book_price' => $this->book->price + 1,
@@ -74,7 +74,7 @@ class AllowBookRentRuleTest extends TestCase
         $this->assertFalse($rule->passes('book', $this->book->id));
     }
 
-    public function testAllow()
+    public function testAllow(): void
     {
         $subscriptionPlan = SubscriptionPlanFactory::new()->create([
             'max_book_price' => $this->book->price + 1,

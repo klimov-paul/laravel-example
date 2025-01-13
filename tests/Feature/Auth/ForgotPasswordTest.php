@@ -38,7 +38,7 @@ class ForgotPasswordTest extends TestCase
         $this->user = UserFactory::new()->create();
     }
 
-    public function testShowLinkRequestForm()
+    public function testShowLinkRequestForm(): void
     {
         $response = $this->get(route('auth.password.request'))
             ->assertSuccessful();
@@ -50,7 +50,7 @@ class ForgotPasswordTest extends TestCase
         $this->assertMatchesRegularExpression('#<body.*>.+</body>#is', $content);*/
     }
 
-    public function testSendResetLink()
+    public function testSendResetLink(): void
     {
         $this->postJson(route('api.auth.password.email'), [
             'email' => $this->user->email,
@@ -82,7 +82,7 @@ class ForgotPasswordTest extends TestCase
     /**
      * @depends testSendResetLink
      */
-    public function testResetPassword()
+    public function testResetPassword(): void
     {
         $token = $this->passwordBroker->createToken($this->user);
 
@@ -126,7 +126,7 @@ class ForgotPasswordTest extends TestCase
     /**
      * @depends testSendResetLink
      */
-    public function testResetPasswordFail()
+    public function testResetPasswordFail(): void
     {
         $newPassword = 'new-password-2';
 

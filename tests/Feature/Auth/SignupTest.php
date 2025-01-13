@@ -24,7 +24,7 @@ class SignupTest extends TestCase
         Notification::fake();
     }
 
-    public function testShowSignupForm()
+    public function testShowSignupForm(): void
     {
         $response = $this->get(route('auth.signup'))
             ->assertSuccessful();
@@ -36,7 +36,7 @@ class SignupTest extends TestCase
         $this->assertMatchesRegularExpression('#<body.*>.+</body>#is', $content);*/
     }
 
-    public function testSignup()
+    public function testSignup(): void
     {
         $user = UserFactory::new()->make();
 

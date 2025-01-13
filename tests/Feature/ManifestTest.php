@@ -9,7 +9,7 @@ use Tests\TestCase;
  */
 class ManifestTest extends TestCase
 {
-    public function testWebManifest()
+    public function testWebManifest(): void
     {
         $this->getJson(route('manifest.webmanifest'))
             ->assertSuccessful()

@@ -10,7 +10,7 @@ use Tests\TestCase;
  */
 class BooksTest extends TestCase
 {
-    public function testIndex()
+    public function testIndex(): void
     {
         $books = BookFactory::new()->count(2)->create();
 
@@ -37,7 +37,7 @@ class BooksTest extends TestCase
             ]);
     }
 
-    public function testShow()
+    public function testShow(): void
     {
         $book = BookFactory::new()->create();
 

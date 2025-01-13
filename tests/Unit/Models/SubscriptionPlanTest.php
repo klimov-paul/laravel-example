@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class SubscriptionPlanTest extends TestCase
 {
-    public function testAllowBook()
+    public function testAllowBook(): void
     {
         $allowedCategory = CategoryFactory::new()->create();
         $disallowedCategory = CategoryFactory::new()->create();

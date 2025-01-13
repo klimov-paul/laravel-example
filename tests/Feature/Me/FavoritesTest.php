@@ -24,7 +24,7 @@ class FavoritesTest extends TestCase
         $this->user = UserFactory::new()->create();
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->actingAs($this->user);
 
@@ -65,7 +65,7 @@ class FavoritesTest extends TestCase
             ]);
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         $this->actingAs($this->user);
 

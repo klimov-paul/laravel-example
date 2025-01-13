@@ -10,7 +10,7 @@ use Tests\TestCase;
  */
 class SubscriptionPlanTest extends TestCase
 {
-    public function testIndex()
+    public function testIndex(): void
     {
         $subscriptionPlans = SubscriptionPlanFactory::new()->count(2)->create();
 
@@ -37,7 +37,7 @@ class SubscriptionPlanTest extends TestCase
             ]);
     }
 
-    public function testShow()
+    public function testShow(): void
     {
         $subscriptionPlan = SubscriptionPlanFactory::new()->create();
 

@@ -24,7 +24,7 @@ class AdminsTest extends TestCase
         $this->admin = AdminFactory::new()->create();
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->actingAs($this->admin, 'web-admin');
 
@@ -37,7 +37,7 @@ class AdminsTest extends TestCase
     /**
      * @depends testIndex
      */
-    public function testPermissions()
+    public function testPermissions(): void
     {
         $this->admin->update(['role' => AdminRoleEnum::CONTENT_MANAGER]);
 

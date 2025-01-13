@@ -65,7 +65,7 @@ class SubscriptionProlongerTest extends TestCase
         return PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
     }
 
-    public function testExpiredNotRecurrent()
+    public function testExpiredNotRecurrent(): void
     {
         $subscription = $this->subscriptionPlan->subscribe($this->user);
 
@@ -93,7 +93,7 @@ class SubscriptionProlongerTest extends TestCase
         });
     }
 
-    public function testExpiredRecurrent()
+    public function testExpiredRecurrent(): void
     {
         $this->createUserPaymentMethod();
 
@@ -127,7 +127,7 @@ class SubscriptionProlongerTest extends TestCase
     /**
      * @depends testExpiredRecurrent
      */
-    public function testNoPaymentMethod()
+    public function testNoPaymentMethod(): void
     {
         $subscription = $this->subscriptionPlan->subscribe($this->user);
 
@@ -158,7 +158,7 @@ class SubscriptionProlongerTest extends TestCase
     /**
      * @depends testExpiredRecurrent
      */
-    public function testExpiredRecurrentFail()
+    public function testExpiredRecurrentFail(): void
     {
         PaymentMethodFactory::new()->create([
             'user_id' => $this->user->id,
@@ -191,7 +191,7 @@ class SubscriptionProlongerTest extends TestCase
         Event::assertNotDispatched(UserSubscriptionTerminated::class);
     }
 
-    public function testActivatePending()
+    public function testActivatePending(): void
     {
         $this->createUserPaymentMethod();
 
@@ -220,7 +220,7 @@ class SubscriptionProlongerTest extends TestCase
     /**
      * @depends testActivatePending
      */
-    public function testMaxPaymentAttemptReach()
+    public function testMaxPaymentAttemptReach(): void
     {
         $paymentMethod = PaymentMethodFactory::new()->create([
             'user_id' => $this->user->id,

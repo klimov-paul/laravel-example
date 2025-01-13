@@ -9,7 +9,7 @@ use Tests\TestCase;
  */
 class RobotsTest extends TestCase
 {
-    public function testGet()
+    public function testGet(): void
     {
         $content = $this->getJson('robots.txt')
             ->assertSuccessful()

@@ -19,7 +19,7 @@ class SitemapTest extends TestCase
         $this->beginDatabaseTransaction();
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $content = $this->getJson('sitemap.xml')
             ->assertSuccessful()

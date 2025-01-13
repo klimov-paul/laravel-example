@@ -35,7 +35,7 @@ class SubscriptionsTest extends TestCase
         $this->subscriptionPlan = SubscriptionPlanFactory::new()->create();
     }
 
-    public function testSubscribe()
+    public function testSubscribe(): void
     {
         $this->actingAs($this->user);
 
@@ -74,7 +74,7 @@ class SubscriptionsTest extends TestCase
     /**
      * @depends testSubscribe
      */
-    public function testHistory()
+    public function testHistory(): void
     {
         $this->actingAs($this->user);
 
@@ -99,7 +99,7 @@ class SubscriptionsTest extends TestCase
     /**
      * @depends testSubscribe
      */
-    public function testShow()
+    public function testShow(): void
     {
         $this->actingAs($this->user);
 
@@ -127,7 +127,7 @@ class SubscriptionsTest extends TestCase
     /**
      * @depends testSubscribe
      */
-    public function testSubscribeErrorNoPaymentMethod()
+    public function testSubscribeErrorNoPaymentMethod(): void
     {
         $this->actingAs($this->user);
 

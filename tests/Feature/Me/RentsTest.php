@@ -25,7 +25,7 @@ class RentsTest extends TestCase
         $this->user = UserFactory::new()->create();
     }
 
-    public function testIndex()
+    public function testIndex(): void
     {
         $this->actingAs($this->user);
 
@@ -66,7 +66,7 @@ class RentsTest extends TestCase
             ]);
     }
 
-    public function testStore()
+    public function testStore(): void
     {
         $this->actingAs($this->user);
 
@@ -99,7 +99,7 @@ class RentsTest extends TestCase
         $this->assertTrue($this->user->rents()->where('book_id', $book->id)->exists());
     }
 
-    public function testShow()
+    public function testShow(): void
     {
         $this->actingAs($this->user);
 
