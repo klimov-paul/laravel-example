@@ -8,6 +8,7 @@ use App\Http\Resources\SubscriptionResource;
 use App\Models\Subscription;
 use App\Models\SubscriptionPlan;
 use App\Models\User;
+use App\Services\Payment\Braintree;
 use App\Services\Subscription\SubscriptionCheckout;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -30,7 +31,7 @@ class SubscriptionController extends Controller
         return SubscriptionResource::collection($subscriptions);
     }
 
-    public function store(Request $request)
+    public function store(Braintree $braintree, Request $request)
     {
         $validatedData = $request->validate([
             'subscription_plan_id' => ['required', 'integer', $subscriptionPlanRule = Exists::new(SubscriptionPlan::class)],
@@ -42,7 +43,7 @@ class SubscriptionController extends Controller
         $subscriptionPlan = $subscriptionPlanRule->getModel();
 
         try {
-            $checkout = new SubscriptionCheckout($request->user(), $subscriptionPlan);
+            $checkout = new SubscriptionCheckout($request->user(), $subscriptionPlan, $braintree);
             $subscription = $checkout->process($validatedData['nonce'] ?? null);
         } catch (PaymentException $e) {
             return response()->json([

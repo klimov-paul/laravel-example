@@ -33,7 +33,7 @@ class SubscriptionCheckoutTest extends TestCase
      */
     protected $subscriptionPlan;
 
-    protected BraintreeMock $paymentGatewayMock;
+    protected BraintreeMock $braintree;
 
     /**
      * {@inheritdoc}
@@ -44,7 +44,7 @@ class SubscriptionCheckoutTest extends TestCase
 
         Event::fake();
 
-        $this->paymentGatewayMock = $this->mockBraintree();
+        $this->braintree = $this->mockBraintree();
 
         $this->user = UserFactory::new()->create();
 
@@ -53,7 +53,7 @@ class SubscriptionCheckoutTest extends TestCase
 
     public function testProcessSuccess(): void
     {
-        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan, $this->braintree);
 
         $subscription = $checkout->process($this->validPaymentMethodNonce());
 
@@ -61,7 +61,7 @@ class SubscriptionCheckoutTest extends TestCase
         $this->assertEquals($this->subscriptionPlan->id, $subscription->subscription_plan_id);
         $this->assertNotNull($this->user->activePaymentMethod);
 
-        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->token]);
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->braintree->balances[$this->user->activePaymentMethod->token]);
 
         Event::assertDispatched(UserSubscribed::class, function (UserSubscribed $e) use ($subscription) {
             return $e->subscription->id === $subscription->id;
@@ -70,7 +70,7 @@ class SubscriptionCheckoutTest extends TestCase
 
     public function testProcessNoPaymentMethod(): void
     {
-        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan, $this->braintree);
 
         $this->expectException(PaymentException::class);
 
@@ -80,30 +80,30 @@ class SubscriptionCheckoutTest extends TestCase
     #[Depends('testProcessSuccess')]
     public function testProcessExistingPaymentMethod(): void
     {
-        PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
+        PaymentMethod::createForUser($this->user, $this->braintree, $this->validPaymentMethodNonce());
 
-        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan, $this->braintree);
 
         $subscription = $checkout->process();
 
         $this->assertEquals($this->user->id, $subscription->user_id);
 
-        $this->assertEquals(-$this->subscriptionPlan->price, $this->paymentGatewayMock->balances[$this->user->activePaymentMethod->token]);
+        $this->assertEquals(-$this->subscriptionPlan->price, $this->braintree->balances[$this->user->activePaymentMethod->token]);
     }
 
     #[Depends('testProcessExistingPaymentMethod')]
     public function testUpgradeSubscription(): void
     {
-        PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
+        PaymentMethod::createForUser($this->user, $this->braintree, $this->validPaymentMethodNonce());
 
-        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan, $this->braintree);
         $checkout->process();
 
         $newSubscriptionPlan = SubscriptionPlanFactory::new()->create([
             'price' => $this->subscriptionPlan->price * 2 + 1,
         ]);
 
-        $checkout = new SubscriptionCheckout($this->user, $newSubscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $newSubscriptionPlan, $this->braintree);
         $subscription = $checkout->process();
 
         $this->assertEquals($newSubscriptionPlan->price - $this->subscriptionPlan->price, $subscription->payments[0]->amount);
@@ -114,16 +114,16 @@ class SubscriptionCheckoutTest extends TestCase
     #[Depends('testProcessExistingPaymentMethod')]
     public function testDowngradeSubscription(): void
     {
-        PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
+        PaymentMethod::createForUser($this->user, $this->braintree, $this->validPaymentMethodNonce());
 
-        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $this->subscriptionPlan, $this->braintree);
         $checkout->process();
 
         $newSubscriptionPlan = SubscriptionPlanFactory::new()->create([
             'price' => $this->subscriptionPlan->price / 2,
         ]);
 
-        $checkout = new SubscriptionCheckout($this->user, $newSubscriptionPlan);
+        $checkout = new SubscriptionCheckout($this->user, $newSubscriptionPlan, $this->braintree);
         $subscription = $checkout->process();
 
         $this->assertCount(0, $subscription->payments);

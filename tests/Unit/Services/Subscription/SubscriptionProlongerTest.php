@@ -23,6 +23,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
 use PHPUnit\Framework\Attributes\Depends;
 use PHPUnit\Framework\Attributes\Group;
+use Tests\Support\Payment\BraintreeMock;
 use Tests\Support\Payment\BraintreeTrait;
 use Tests\TestCase;
 
@@ -42,6 +43,8 @@ class SubscriptionProlongerTest extends TestCase
      */
     protected $subscriptionPlan;
 
+    protected BraintreeMock $braintree;
+
     /**
      * {@inheritdoc}
      */
@@ -49,7 +52,7 @@ class SubscriptionProlongerTest extends TestCase
     {
         parent::setUp();
 
-        $this->mockBraintree();
+        $this->braintree = $this->mockBraintree();
 
         Notification::fake();
 
@@ -62,7 +65,7 @@ class SubscriptionProlongerTest extends TestCase
 
     protected function createUserPaymentMethod(): PaymentMethod
     {
-        return PaymentMethod::createForUser($this->user, $this->validPaymentMethodNonce());
+        return PaymentMethod::createForUser($this->user, $this->braintree, $this->validPaymentMethodNonce());
     }
 
     public function testExpiredNotRecurrent(): void
@@ -75,7 +78,7 @@ class SubscriptionProlongerTest extends TestCase
             'is_recurrent' => false,
         ]);
 
-        $handler = new SubscriptionProlonger($subscription);
+        $handler = new SubscriptionProlonger($subscription, $this->braintree);
         $handler->handleExpiration();
 
         $subscriptions = $this->user->subscriptions()->orderBy('id')->get();
@@ -105,7 +108,7 @@ class SubscriptionProlongerTest extends TestCase
             'is_recurrent' => true,
         ]);
 
-        $handler = new SubscriptionProlonger($subscription);
+        $handler = new SubscriptionProlonger($subscription, $this->braintree);
         $handler->handleExpiration();
 
         $subscriptions = $this->user->subscriptions()->orderBy('id')->get();
@@ -135,7 +138,7 @@ class SubscriptionProlongerTest extends TestCase
             'is_recurrent' => true,
         ]);
 
-        $handler = new SubscriptionProlonger($subscription);
+        $handler = new SubscriptionProlonger($subscription, $this->braintree);
         $handler->handleExpiration();
 
         $subscriptions = $this->user->subscriptions()->orderBy('id')->get();
@@ -168,7 +171,7 @@ class SubscriptionProlongerTest extends TestCase
             'is_recurrent' => true,
         ]);
 
-        $handler = new SubscriptionProlonger($subscription);
+        $handler = new SubscriptionProlonger($subscription, $this->braintree);
         $handler->handleExpiration();
 
         $subscriptions = $this->user->subscriptions()->orderBy('id')->get();
@@ -195,7 +198,7 @@ class SubscriptionProlongerTest extends TestCase
             'status' => SubscriptionStatus::PENDING,
         ]);
 
-        $handler = new SubscriptionProlonger($subscription);
+        $handler = new SubscriptionProlonger($subscription, $this->braintree);
         $handler->handlePending();
 
         $subscriptions = $this->user->subscriptions()->orderBy('id')->get();
@@ -232,7 +235,7 @@ class SubscriptionProlongerTest extends TestCase
             $subscription->payments()->attach($payment->id);
         }
 
-        $handler = new SubscriptionProlonger($subscription);
+        $handler = new SubscriptionProlonger($subscription, $this->braintree);
         $handler->handlePending();
 
         $subscriptions = $this->user->subscriptions()->orderBy('id')->get();

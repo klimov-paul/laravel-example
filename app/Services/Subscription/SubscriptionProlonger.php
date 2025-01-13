@@ -12,6 +12,7 @@ use App\Notifications\Subscription\SubscriptionProlongationCancelled;
 use App\Notifications\Subscription\SubscriptionProlongationNoPaymentMethodFailure;
 use App\Notifications\Subscription\SubscriptionProlongationPaymentFailure;
 use App\Notifications\Subscription\SubscriptionProlongationSucceed;
+use App\Services\Payment\Braintree;
 use LogicException;
 
 /**
@@ -29,9 +30,15 @@ class SubscriptionProlonger
      */
     protected $subscription;
 
-    public function __construct(Subscription $subscription)
+    /**
+     * @var \App\Services\Payment\Braintree braintree payment gateway instance.
+     */
+    protected $braintree;
+
+    public function __construct(Subscription $subscription, Braintree $braintree)
     {
         $this->subscription = $subscription;
+        $this->braintree = $braintree;
     }
 
     /**
@@ -100,6 +107,7 @@ class SubscriptionProlonger
             ->user
             ->activePaymentMethod
             ->pay(
+                $this->braintree,
                 $this->subscription->subscriptionPlan->price,
                 PaymentType::SUBSCRIPTION
             );
@@ -138,7 +146,11 @@ class SubscriptionProlonger
         $payment = $this->subscription
             ->user
             ->activePaymentMethod
-            ->pay($this->subscription->subscriptionPlan->price, PaymentType::SUBSCRIPTION);
+            ->pay(
+                $this->braintree,
+                $this->subscription->subscriptionPlan->price,
+                PaymentType::SUBSCRIPTION
+            );
 
         $this->subscription->payments()->attach($payment);
 

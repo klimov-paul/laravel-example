@@ -4,6 +4,7 @@ namespace App\Services\Subscription;
 
 use App\Events\Subscription\UserSubscribed;
 use App\Models\PaymentMethod;
+use App\Services\Payment\Braintree;
 use Throwable;
 use App\Models\User;
 use App\Enums\PaymentType;
@@ -23,21 +24,11 @@ use App\Models\Subscription;
  */
 class SubscriptionCheckout
 {
-    /**
-     * @var User user to be subscribed.
-     */
-    private $user;
-
-    /**
-     * @var SubscriptionPlan subscription plan to be applied for the {@link user}
-     */
-    private $subscriptionPlan;
-
-    public function __construct(User $user, SubscriptionPlan $subscriptionPlan)
-    {
-        $this->user = $user;
-        $this->subscriptionPlan = $subscriptionPlan;
-    }
+    public function __construct(
+        private readonly User $user,
+        private readonly SubscriptionPlan $subscriptionPlan,
+        private readonly Braintree $braintree
+    ) {}
 
     public function process($paymentMethodNonce = null): Subscription
     {
@@ -45,7 +36,7 @@ class SubscriptionCheckout
 
         try {
             if ($paymentMethodNonce) {
-                PaymentMethod::createForUser($this->user, $paymentMethodNonce);
+                PaymentMethod::createForUser($this->user, $this->braintree, $paymentMethodNonce);
             }
 
             $isNewSubscription = ($this->user->activeSubscription === null);
@@ -56,7 +47,7 @@ class SubscriptionCheckout
                     throw new PaymentException('Unable to perform payment: there is no credit card available.');
                 }
 
-                $payment = $this->user->activePaymentMethod->pay($paymentAmount, PaymentType::SUBSCRIPTION);
+                $payment = $this->user->activePaymentMethod->pay($this->braintree, $paymentAmount, PaymentType::SUBSCRIPTION);
 
                 if (!$payment->isSuccessful()) {
                     throw new PaymentException('Unable to perform payment: '.$payment->getErrorMessage());

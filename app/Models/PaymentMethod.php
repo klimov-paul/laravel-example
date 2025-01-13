@@ -5,7 +5,6 @@ namespace App\Models;
 use App\Services\Payment\Braintree;
 use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Support\Facades\App;
 use App\Enums\PaymentType;
 use App\Enums\PaymentMethodStatus;
 use App\Enums\PaymentStatus;
@@ -94,11 +93,12 @@ class PaymentMethod extends Model
     }
 
     /**
-     * @param \app\models\User $user user to bind new payment method to.
+     * @param \App\Models\User $user user to bind new payment method to.
+     * @param \App\Services\Payment\Braintree $braintree the Braintree payment gateway instance.
      * @param string $paymentMethodNonce payment method nonce received from client side SDK.
      * @return static new model instance.
      */
-    public static function createForUser(User $user, string $paymentMethodNonce): self
+    public static function createForUser(User $user, Braintree $braintree, string $paymentMethodNonce): self
     {
         $model = new static();
 
@@ -109,9 +109,9 @@ class PaymentMethod extends Model
         $customerId = static::findLatestCustomerId($user->id);
 
         if (empty($customerId)) {
-            $model = $model->createAsPaymentGatewayCustomer($paymentMethodNonce);
+            $model = $model->createAsPaymentGatewayCustomer($braintree, $paymentMethodNonce);
         } else {
-            $model = $model->createAsPaymentGatewayMethod($customerId, $paymentMethodNonce);
+            $model = $model->createAsPaymentGatewayMethod($braintree, $customerId, $paymentMethodNonce);
         }
 
         static::query()
@@ -125,11 +125,11 @@ class PaymentMethod extends Model
         return $model;
     }
 
-    protected function createAsPaymentGatewayCustomer(string $paymentMethodNonce): self
+    protected function createAsPaymentGatewayCustomer(Braintree $braintree, string $paymentMethodNonce): self
     {
         $nameParts = explode(' ', $this->user->name);
 
-        $paymentMethod = $this->paymentGateway()->createCustomerWithPaymentMethod($paymentMethodNonce, [
+        $paymentMethod = $braintree->createCustomerWithPaymentMethod($paymentMethodNonce, [
             'firstName' => $nameParts[0] ?? null,
             'lastName' => $nameParts[1] ?? null,
             'email' => $this->user->email,
@@ -138,9 +138,9 @@ class PaymentMethod extends Model
         return $this->createFromPaymentMethodData($paymentMethod);
     }
 
-    protected function createAsPaymentGatewayMethod(string $customerId, string $paymentMethodNonce): self
+    protected function createAsPaymentGatewayMethod(Braintree $braintree, string $customerId, string $paymentMethodNonce): self
     {
-        $paymentMethod = $this->paymentGateway()->createPaymentMethod($customerId, $paymentMethodNonce);
+        $paymentMethod = $braintree->createPaymentMethod($customerId, $paymentMethodNonce);
 
         $alreadyExistingModel = static::query()
             ->where([
@@ -179,13 +179,14 @@ class PaymentMethod extends Model
     /**
      * Performs charge over this credit card, creating a `Payment` from results.
      *
+     * @param \App\Services\Payment\Braintree $braintree the Braintree payment gateway instance.
      * @param float $amount payment amount in major units, e.g. dollars
      * @param int $type payment type.
      * @param array $options additional transaction options.
      * @param array $attributes additional payment attributes.
      * @return \App\Models\Payment
      */
-    public function pay($amount, $type, array $options = [], array $attributes = []): Payment
+    public function pay(Braintree $braintree, $amount, $type, array $options = [], array $attributes = []): Payment
     {
         $options['customer']['email'] = $this->user->email;
 
@@ -209,7 +210,7 @@ class PaymentMethod extends Model
         }
 
         try {
-            $paymentResult = $this->charge($amount, $options);
+            $paymentResult = $this->charge($braintree, $amount, $options);
         } catch (Exception $e) {
             return $this->payments()->create(array_merge([
                 'type' => $type,
@@ -227,13 +228,8 @@ class PaymentMethod extends Model
         ], $attributes));
     }
 
-    protected function charge($amount, array $options): array
+    protected function charge(Braintree $braintree, $amount, array $options): array
     {
-        return $this->paymentGateway()->sale($this->token, $amount, $options);
-    }
-
-    protected function paymentGateway(): Braintree
-    {
-        return App::get(Braintree::class);
+        return $braintree->sale($this->token, $amount, $options);
     }
 }

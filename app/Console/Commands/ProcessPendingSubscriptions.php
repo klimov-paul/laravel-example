@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use App\Enums\SubscriptionStatus;
 use App\Models\Subscription;
+use App\Services\Payment\Braintree;
 use App\Services\Subscription\SubscriptionProlonger;
 use Illuminate\Console\Command;
 
@@ -29,7 +30,7 @@ class ProcessPendingSubscriptions extends Command
      */
     protected $description = 'Handles pending user subscriptions.';
 
-    public function handle()
+    public function handle(Braintree $braintree)
     {
         $query = Subscription::query()
             ->with(['user.activeCreditCard', 'subscriptionPlan'])
@@ -40,9 +41,9 @@ class ProcessPendingSubscriptions extends Command
 
         $this->info('Processing pending user subscriptions (' . $totalCount . ')...');
 
-        $query->chunk(200, function ($subscriptions) use ($successCount, $totalCount) {
+        $query->chunk(200, function ($subscriptions) use ($braintree, $successCount, $totalCount) {
             foreach ($subscriptions as $subscription) {
-                (new SubscriptionProlonger($subscription))->handlePending();
+                (new SubscriptionProlonger($subscription, $braintree))->handlePending();
                 $successCount++;
             }
 
