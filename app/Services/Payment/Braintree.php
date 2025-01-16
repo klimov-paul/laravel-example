@@ -149,7 +149,21 @@ class Braintree
         ], $options));
 
         if (!$response->success) {
-            throw new \RuntimeException('Braintree was unable to perform a sale: ' . $response->message);
+            $errorMessage = $response->message;
+            $errorCode = 0;
+
+            if (!empty($response->transaction->status)) {
+                $errorMessage .= ': ' . $response->transaction->status;
+            }
+            if (!empty($response->transaction->processorResponseCode)) {
+                $errorMessage .= ' #' . $response->transaction->processorResponseCode;
+                $errorCode = (int) $response->transaction->processorResponseCode;
+            }
+            if (!empty($response->transaction->processorResponseText)) {
+                $errorMessage .= ' (' . $response->transaction->processorResponseText . ')';
+            }
+
+            throw new \RuntimeException('Braintree was unable to perform a sale: ' . $errorMessage, $errorCode);
         }
 
         return $response->transaction->jsonSerialize();
